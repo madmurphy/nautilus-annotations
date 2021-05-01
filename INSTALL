@@ -1,0 +1,37 @@
+INSTALL
+=======
+
+On most Unix-like systems, you should be able to install this package using the
+following common steps:
+
+    ./configure
+    make
+    make install-strip
+
+If the `strip` utility is not available on your machine, use `make install`
+instead (it will produce larger binaries).
+
+If you need to customize the target directories, or otherwise adjust the build
+setting, use
+
+    ./configure --help
+
+to list the configure options.
+
+If the `configure` script is missing from your package you need to create it by
+running the `bootstrap` script. Use the `--noconfigure` parameter in order to
+prevent `bootstrap` from running automatically `configure` immediately after
+having generated it. To list different options use `bootstrap --help`.
+
+
+Dependencies
+------------
+
+This plugin depends on the following packages:
+
+* glib2
+* gtksourceview4
+* libnautilus-extension
+
+Make sure that they are present before compiling the source code.
+

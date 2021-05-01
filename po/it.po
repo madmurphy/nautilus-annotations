@@ -1,0 +1,112 @@
+# Italian translations for nautilus-annotations package.
+# Copyright (C) 2021 <madmurphy333@gmail.com>
+# This file is distributed under the same license as the nautilus-annotations
+# package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: 0.1.1\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-05-01 10:56+0200\n"
+"PO-Revision-Date: 2021-05-01 10:56+0200\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Italian <tp@lists.linux.it>\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: ../src/nautilus-annotations.c:135 ../src/nautilus-annotations.c:365
+msgid "Annotations"
+msgstr "Annotazioni"
+
+#: ../src/nautilus-annotations.c:138
+msgid "_OK"
+msgstr "_OK"
+
+#: ../src/nautilus-annotations.c:140
+msgid "_Cancel"
+msgstr "_Annulla"
+
+#: ../src/nautilus-annotations.c:189
+msgid "_Discard changes"
+msgstr "_Scarta le modifiche"
+
+#: ../src/nautilus-annotations.c:234
+msgid "Could not erase file's annotations"
+msgstr "Impossibile eliminare le annotazioni dal file"
+
+#: ../src/nautilus-annotations.c:306
+msgid "Could not save file's annotations"
+msgstr "Impossibile salvare le annotazioni per il file"
+
+#: ../src/nautilus-annotations.c:328
+msgid "Are you sure you want to discard the current changes?"
+msgstr "Si è sicuri di voler scartare le modifiche correnti?"
+
+#: ../src/nautilus-annotations.c:473 ../src/nautilus-annotations.c:521
+msgid "Error allocating memory"
+msgstr "Errore nell'allocare memoria"
+
+#: ../src/nautilus-annotations.c:484
+msgid "Do you really want to remove the annotations from the selected file?"
+msgid_plural ""
+"Do you really want to remove all annotations from the selected files?"
+msgstr[0] "Si vogliono davvero eliminare le annotazioni presenti nel file?"
+msgstr[1] ""
+"Si vogliono davvero eliminare tutte le annotazioni presenti nei file "
+"selezionati?"
+
+#: ../src/nautilus-annotations.c:542
+msgid "Could not access file's annotations"
+msgstr "Impossibile accedere alle annotazioni del file"
+
+#: ../src/nautilus-annotations.c:580
+msgid ""
+"At least two annotations in the file selection differ.\n"
+"This will set up a blank new note."
+msgstr ""
+"Almeno due annotazioni nella selezione differiscono.\n"
+"Ciò comporterà la creazione di una annotazione ex novo."
+
+#: ../src/nautilus-annotations.c:666
+msgid "Ignoring possible annotations"
+msgstr "Ignorate eventuali annotazioni presenti"
+
+#: ../src/nautilus-annotations.c:686
+msgid "_Remove annotations from file"
+msgid_plural "_Remove annotations from files"
+msgstr[0] "_Rimuovi le annotazioni dal file"
+msgstr[1] "_Rimuovi le annotazioni dai file"
+
+#: ../src/nautilus-annotations.c:692
+msgid "Remove annotations from the selected file"
+msgid_plural "Remove annotations from the selected files"
+msgstr[0] "Rimuovi le annotazioni presenti nel file selezionato"
+msgstr[1] "Rimuovi le annotazioni presenti nei file selezionati"
+
+#: ../src/nautilus-annotations.c:729
+msgid "Edit file's an_notations"
+msgid_plural "Edit files' an_notations"
+msgstr[0] "Modifica le an_notazioni del file"
+msgstr[1] "Modifica le an_notazioni dei file"
+
+#: ../src/nautilus-annotations.c:735
+msgid "Edit the current annotations for this file"
+msgid_plural "Edit the current annotations for these files"
+msgstr[0] "Modifica le annotazioni correnti per questo file"
+msgstr[1] "Modifica le annotazioni correnti per questi file"
+
+#: ../src/nautilus-annotations.c:748
+msgid "An_notate file"
+msgid_plural "An_notate files"
+msgstr[0] "An_nota il file"
+msgstr[1] "An_nota i file"
+
+#: ../src/nautilus-annotations.c:754
+msgid "Attach a note to this file"
+msgid_plural "Attach a note to these files"
+msgstr[0] "Allega una nota a questo file"
+msgstr[1] "Allega una nota a questi file"

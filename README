@@ -1,0 +1,124 @@
+Nautilus Annotations
+====================
+
+Annotate files and directories
+
+
+Details
+-------
+
+Long time ago **GNOME Files** (**Nautilus**) had the ability to handle custom
+annotations attached to files and directories. This ability has slowly gone
+lost among the folds of time. Things however are rarely really unlearned, and
+an ability rarely goes away for good.
+
+**Nautilus Annotations** brings back Nautilus' annotation capabilities. It
+expoits the same machinery that was used back then: that of relying on **GIO**
+to store custom information about a file or a directory.
+
+Each annotation is stored as a `metadata::annotation` entry in **GIO**'s
+database. Annotated files are visually marked with an emblem (if the emblem
+does not appear/disappear immediately after setting or unsetting an annotation,
+press `Ctrl` + `R` or `F5` to refresh the viewport).
+
+To erase an annotation it is sufficient to leave the content blank, and the
+extension will take care of erasing the database entry.
+
+The extension's dialog window for editing the annotations is still very
+minimal, albeit polished.
+
+Thanks to **GIO**, when a file is moved or renamed its annotations remain
+synchronized with the new path.
+
+It is possible to access the file annotations via command line, by launching:
+
+``` sh
+gio info --attributes='metadata::annotation' /path/to/file
+```
+
+For setting an annotation via command line, launch:
+
+``` sh
+gio set /path/to/file 'metadata::annotation' 'Content of annotation goes here'
+```
+
+
+Get involved
+------------
+
+The package needs help with internationalization. If a translation into your
+language is missing and you wish to get involved, here is what to do.
+
+Let's say you want to create a Dutch translation of **Nautilus Annotations**.
+The extension comes with only a bunch of strings to translate. First thing to
+do is to make sure that `gettext` and `intltool` are installed on your system.
+Then clone this repository and launch the following four commands:
+
+``` sh
+cd nautilus-annotations/po
+intltool-update -p
+msginit -l nl
+rm NautilusAnnotations.pot
+```
+
+Now edit the `po/LINGUAS` file and add a new line containing the abbreviated
+name of the new language (`nl`).
+
+Finally, open the `po/nl.po` file and translate the strings present. All you
+have to do now is to commit your changes.
+
+If you want to update an existing Dutch translation to the most recent changes
+in the extension source code, launch
+
+``` sh
+cd nautilus-annotations/po
+intltool-update -p
+mv nl.po nl.po.bak && msgmerge nl.po.bak NautilusAnnotations.pot > nl.po
+rm NautilusAnnotations.pot nl.po.bak
+```
+
+For any issue, [drop me a message][1].
+
+
+Installation
+------------
+
+On most Unix-like systems, you should be able to install this package using the
+following common steps:
+
+    ./configure
+    make
+    make install-strip
+
+If the `strip` utility is not available on your machine, use `make install`
+instead (it will produce larger binaries).
+
+If the `configure` script is missing from your package you need to generate it
+by running the `bootstrap` script. By default, `bootstrap` will also run the
+`configure` script immediately after having generated it, so you may type the
+`make` command directly after `bootstrap`. To list different options use
+`./bootstrap --help`.
+
+For further information, see [INSTALL][2].
+
+
+NExtGen
+-------
+
+This extension has been created using [NExtGen][3] Nautilus extension
+generator.
+
+
+Free software
+-------------
+
+This extension is free software. You can redistribute it and/or modify it under
+the terms of the GPL license version 3 or any later version. See [COPYING][4]
+for details.
+
+
+  [1]: https://gitlab.gnome.org/madmurphy/nautilus-annotations/issues
+  [2]: INSTALL
+  [3]: https://gitlab.gnome.org/madmurphy/nextgen
+  [4]: COPYING
+

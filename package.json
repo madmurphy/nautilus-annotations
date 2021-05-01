@@ -1,0 +1,41 @@
+{
+	"name": "nautilus-annotations",
+	"version": "0.1.0",
+	"description": "Annotate files and directories",
+	"homepage": "https://gitlab.gnome.org/madmurphy/nautilus-annotations",
+	"author": "madmurphy",
+	"license": "GPL-3.0-or-later",
+	"repository": {
+		"type": "git",
+		"url": "https://gitlab.gnome.org/madmurphy/nautilus-annotations.git"
+	},
+	"dependencies": {
+		"glib2": "*",
+		"libnautilus-extension": "*",
+		"gtksourceview4": "*",
+	},
+	"devDependencies": {
+		"pkgconf": "*",
+		"intltool": "*"
+	},
+	"src": [
+		"src/nautilus-annotations.c"
+	],
+	"bugs": {
+		"url": "https://gitlab.gnome.org/madmurphy/nautilus-annotations/issues",
+		"email" : "madmurphy333@gmail.com"
+	},
+	"keywords": [
+		"annotations",
+		"c",
+		"file-metadata",
+		"gnome",
+		"gio",
+		"gvfs",
+		"metadata",
+		"nautilus",
+		"nautilus-extension",
+		"notes"
+	]
+}
+
