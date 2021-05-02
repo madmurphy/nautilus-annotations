@@ -2,6 +2,14 @@ NEWS
 ====
 
 
+## 0.2.0
+
+* Markdown syntax highlighting has been enabled
+* The title bar now shows the file's path
+* Emblems are now added/removed instantly
+
+
 ## 0.1.0
 
 **Nautilus Annotations** has been published.
+

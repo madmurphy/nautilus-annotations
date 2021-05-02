@@ -15,7 +15,9 @@ dist_doc_DATA = \
 
 emblemsdir = $(datadir)/icons
 dist_emblems_DATA = \
-	plugin-data/emblem-annotations.svg
+	plugin-data/annotate.svg \
+	plugin-data/emblem-annotations.svg \
+	plugin-data/unannotate.svg
 
 INTLTOOL_FILES = \
 	intltool-extract.in \

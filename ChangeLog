@@ -2,6 +2,18 @@ Change Log
 ==========
 
 
+## 0.2.0 (2021-05-02)
+
+Changes:
+
+* Markdown syntax highlighting has been enabled
+* The title bar now shows the file's path
+* Emblems are now added/removed instantly
+* A better coherence has been established in deciding when to save or discard
+  an annotation
+
+
 ## 0.1.0 (2021-05-01)
 
 **Nautilus Annotations** has been published.
+
