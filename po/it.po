@@ -6,10 +6,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: 0.2.0\n"
-"Report-Msgid-Bugs-To: FULL NAME <EMAIL@ADDRESS>\n"
-"POT-Creation-Date: 2021-05-01 18:28+0200\n"
-"PO-Revision-Date: 2021-05-01 18:28+0200\n"
+"Project-Id-Version: 0.3.0\n"
+"Report-Msgid-Bugs-To: <madmurphy333@gmail.com>\n"
+"POT-Creation-Date: 2021-05-03 00:14+0200\n"
+"PO-Revision-Date: 2021-05-03 00:14+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Italian <tp@lists.linux.it>\n"
 "Language: it\n"
@@ -18,47 +18,47 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: ../src/nautilus-annotations.c:129 ../src/nautilus-annotations.c:380
+#: ../src/nautilus-annotations.c:135 ../src/nautilus-annotations.c:420
 msgid "Annotations"
 msgstr "Annotazioni"
 
-#: ../src/nautilus-annotations.c:132
+#: ../src/nautilus-annotations.c:138
 msgid "_OK"
 msgstr "_OK"
 
-#: ../src/nautilus-annotations.c:134
+#: ../src/nautilus-annotations.c:140
 msgid "_Cancel"
 msgstr "_Annulla"
 
-#: ../src/nautilus-annotations.c:195
+#: ../src/nautilus-annotations.c:210
 msgid "_Discard changes"
 msgstr "_Scarta le modifiche"
 
-#: ../src/nautilus-annotations.c:233
+#: ../src/nautilus-annotations.c:250
 msgid "Could not erase file's annotations"
 msgstr "Impossibile eliminare le annotazioni dal file"
 
-#: ../src/nautilus-annotations.c:315
+#: ../src/nautilus-annotations.c:340
 msgid "Could not save file's annotations"
 msgstr "Impossibile salvare le annotazioni per il file"
 
-#: ../src/nautilus-annotations.c:337
+#: ../src/nautilus-annotations.c:362
 msgid "Are you sure you want to discard the current changes?"
 msgstr "Si è sicuri di voler scartare le modifiche correnti?"
 
-#: ../src/nautilus-annotations.c:386
+#: ../src/nautilus-annotations.c:426
 msgid "Annotations shared between multiple files"
 msgstr "Annotazioni condivise tra più file"
 
-#: ../src/nautilus-annotations.c:502
+#: ../src/nautilus-annotations.c:546
 msgid "No files were selected to be unannotated"
 msgstr "Non ci sono file selezionati da cui rimuovere annotazioni"
 
-#: ../src/nautilus-annotations.c:519 ../src/nautilus-annotations.c:583
+#: ../src/nautilus-annotations.c:564 ../src/nautilus-annotations.c:631
 msgid "Error allocating memory"
 msgstr "Errore nell'allocare memoria"
 
-#: ../src/nautilus-annotations.c:530
+#: ../src/nautilus-annotations.c:575
 msgid "Do you really want to remove the annotations from the selected file?"
 msgid_plural ""
 "Do you really want to remove all annotations from the selected files?"
@@ -67,15 +67,15 @@ msgstr[1] ""
 "Si vogliono davvero eliminare tutte le annotazioni presenti nei file "
 "selezionati?"
 
-#: ../src/nautilus-annotations.c:556
+#: ../src/nautilus-annotations.c:603
 msgid "No files were selected to be annotated"
 msgstr "Non ci sono file selezionati da annotare"
 
-#: ../src/nautilus-annotations.c:604
+#: ../src/nautilus-annotations.c:652
 msgid "Could not access file's annotations"
 msgstr "Impossibile accedere alle annotazioni del file"
 
-#: ../src/nautilus-annotations.c:639
+#: ../src/nautilus-annotations.c:687
 msgid ""
 "At least two annotations in the file selection differ.\n"
 "This will set up a blank new note."
@@ -83,37 +83,37 @@ msgstr ""
 "Almeno due annotazioni nella selezione differiscono.\n"
 "Questo comporterà l'apertura di una annotazione vuota."
 
-#: ../src/nautilus-annotations.c:736
+#: ../src/nautilus-annotations.c:771
 msgid "_Remove annotations from file"
 msgid_plural "_Remove annotations from files"
 msgstr[0] "_Rimuovi le annotazioni dal file"
 msgstr[1] "_Rimuovi le annotazioni dai file"
 
-#: ../src/nautilus-annotations.c:742
+#: ../src/nautilus-annotations.c:777
 msgid "Remove annotations from the selected file"
 msgid_plural "Remove annotations from the selected files"
 msgstr[0] "Rimuovi le annotazioni presenti nel file selezionato"
 msgstr[1] "Rimuovi le annotazioni presenti nei file selezionati"
 
-#: ../src/nautilus-annotations.c:779
+#: ../src/nautilus-annotations.c:814
 msgid "Edit file's an_notations"
 msgid_plural "Edit files' an_notations"
 msgstr[0] "Modifica le an_notazioni del file"
 msgstr[1] "Modifica le an_notazioni dei file"
 
-#: ../src/nautilus-annotations.c:785
+#: ../src/nautilus-annotations.c:820
 msgid "Edit the current annotations for this file"
 msgid_plural "Edit the current annotations for these files"
 msgstr[0] "Modifica le annotazioni correnti per questo file"
 msgstr[1] "Modifica le annotazioni correnti per questi file"
 
-#: ../src/nautilus-annotations.c:798
+#: ../src/nautilus-annotations.c:833
 msgid "An_notate file"
 msgid_plural "An_notate files"
 msgstr[0] "An_nota il file"
 msgstr[1] "An_nota i file"
 
-#: ../src/nautilus-annotations.c:804
+#: ../src/nautilus-annotations.c:839
 msgid "Attach a note to this file"
 msgid_plural "Attach a note to these files"
 msgstr[0] "Allega una nota a questo file"

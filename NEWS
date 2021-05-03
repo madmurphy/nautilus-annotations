@@ -2,6 +2,13 @@ NEWS
 ====
 
 
+## 0.3.0
+
+* The annotation window has become transient for Nautilus
+* A CSS has been created for styling the extension's graphical interface
+  (`/usr/share/nautilus-annotations/style.css`)
+
+
 ## 0.2.0
 
 * Markdown syntax highlighting has been enabled

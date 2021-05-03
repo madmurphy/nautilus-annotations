@@ -4,6 +4,8 @@
 |*|
 |*| nautilus-annotations.c
 |*|
+|*| https://gitlab.gnome.org/madmurphy/nautilus-annotations
+|*|
 |*| Copyright (C) 2021 <madmurphy333@gmail.com>
 |*|
 |*| **Nautilus Annotations** is free software: you can redistribute it and/or
@@ -79,14 +81,18 @@ typedef void (* OneParamFunc) (
 static GType provider_types[1];
 static GType nautilus_annotations_type;
 static GObjectClass * parent_class;
+static GtkCssProvider * annotations_css;
 
 /*
-Many other possibly key names would do, although `"metadata::annotation"` is
-the key that was originally used by Nautilus.
+Many other possible key names would do, however `"metadata::annotation"` is the
+key that was originally used by Nautilus.
 */
 #ifndef G_FILE_ATTRIBUTE_METADATA_ANNOTATION
 #define G_FILE_ATTRIBUTE_METADATA_ANNOTATION "metadata::annotation"
 #endif
+
+/*  The CSS to add to the screen  */
+#define NAUTILUS_ANNOTATIONS_CSS PACKAGE_DATA_DIR "/style.css"
 
 
 
@@ -124,7 +130,7 @@ static void quick_ok_cancel (
 ) {
 
 	GtkWidget
-		* const dialog =
+		* const question_dialog =
 			gtk_dialog_new_with_buttons(
 				_("Annotations"),
 				parent,
@@ -135,24 +141,29 @@ static void quick_ok_cancel (
 				GTK_RESPONSE_CANCEL,
 				NULL
 			),
-		* const label =
+		* const question_label =
 			gtk_label_new(text_message);
 
-	#define NA_QUESTION_MARGINS 16
-	gtk_widget_set_margin_top(label, NA_QUESTION_MARGINS);
-	gtk_widget_set_margin_bottom(label, NA_QUESTION_MARGINS);
-	gtk_widget_set_margin_start(label, NA_QUESTION_MARGINS);
-	gtk_widget_set_margin_end(label, NA_QUESTION_MARGINS);
-	#undef NA_QUESTION_MARGINS
-
-	gtk_container_add(
-		GTK_CONTAINER(gtk_dialog_get_content_area(GTK_DIALOG(dialog))),
-		label
+	gtk_style_context_add_class(
+		gtk_widget_get_style_context(question_dialog),
+		"nautilus-okcancel-annotations"
 	);
 
-	gtk_widget_show(label);
+	gtk_style_context_add_class(
+		gtk_widget_get_style_context(question_label),
+		"nautilus-question-annotations"
+	);
 
-	int response_id = gtk_dialog_run(GTK_DIALOG(dialog));
+	gtk_container_add(
+		GTK_CONTAINER(
+			gtk_dialog_get_content_area(GTK_DIALOG(question_dialog))
+		),
+		question_label
+	);
+
+	gtk_widget_show(question_label);
+
+	int response_id = gtk_dialog_run(GTK_DIALOG(question_dialog));
 
 	if (cb_ok && response_id == GTK_RESPONSE_OK) {
 
@@ -164,12 +175,12 @@ static void quick_ok_cancel (
 
 	}
 
-	gtk_widget_destroy(dialog);
+	gtk_widget_destroy(question_dialog);
 
 }
 
 
-static void user_has_changed_text (
+static void on_text_modified_state_change (
 	GtkSourceBuffer * const text_buffer,
 	gpointer const user_data
 ) {
@@ -177,7 +188,11 @@ static void user_has_changed_text (
 	#define na_common ((NautilusAnnotationsCommon *) user_data)
 
 	switch (
-		(gtk_text_buffer_get_modified(GTK_TEXT_BUFFER(na_common->source_buffer)) << 1) |
+		(
+			gtk_text_buffer_get_modified(
+				GTK_TEXT_BUFFER(na_common->source_buffer)
+			) << 1
+		) |
 		!na_common->discard_button
 	) {
 
@@ -208,23 +223,25 @@ static void erase_annotations (
 	gpointer const user_data
 ) {
 
+	#define na_common ((NautilusAnnotationsCommon *) user_data)
+
 	GError * set_err = NULL;
 
-	for (
-		GList * iter = ((NautilusAnnotationsCommon *) user_data)->file_selection;
-			iter;
-		iter = iter->next
-	) {
+	for (GList * iter = na_common->file_selection; iter; iter = iter->next) {
 
-		if (!g_file_set_attribute(
-			nautilus_file_info_get_location(NAUTILUS_FILE_INFO(iter->data)),
-			G_FILE_ATTRIBUTE_METADATA_ANNOTATION,
-			G_FILE_ATTRIBUTE_TYPE_INVALID,
-			NULL,
-			G_FILE_QUERY_INFO_NONE,
-			NULL,
-			&set_err
-		)) {
+		if (
+			!g_file_set_attribute(
+				nautilus_file_info_get_location(
+					NAUTILUS_FILE_INFO(iter->data)
+				),
+				G_FILE_ATTRIBUTE_METADATA_ANNOTATION,
+				G_FILE_ATTRIBUTE_TYPE_INVALID,
+				NULL,
+				G_FILE_QUERY_INFO_NONE,
+				NULL,
+				&set_err
+			)
+		) {
 
 			fprintf(
 				stderr,
@@ -246,6 +263,8 @@ static void erase_annotations (
 
 	destroy_na_common(user_data);
 
+	#undef na_common
+
 }
 
 static void on_annotation_dialog_response (
@@ -256,7 +275,11 @@ static void on_annotation_dialog_response (
 
 	#define na_common ((NautilusAnnotationsCommon *) user_data)
 
-	if (!gtk_text_buffer_get_modified(GTK_TEXT_BUFFER(na_common->source_buffer))) {
+	if (
+		!gtk_text_buffer_get_modified(
+			GTK_TEXT_BUFFER(na_common->source_buffer)
+		)
+	) {
 
 		goto destroy_and_leave;
 
@@ -299,7 +322,9 @@ static void on_annotation_dialog_response (
 
 				if (
 					!g_file_set_attribute_string(
-						nautilus_file_info_get_location(NAUTILUS_FILE_INFO(iter->data)),
+						nautilus_file_info_get_location(
+							NAUTILUS_FILE_INFO(iter->data)
+						),
 						G_FILE_ATTRIBUTE_METADATA_ANNOTATION,
 						text_content,
 						G_FILE_QUERY_INFO_NONE,
@@ -370,9 +395,24 @@ static void show_annotations (
 
 	na_common->annotation_dialog = GTK_DIALOG(gtk_dialog_new());
 
+	gtk_style_context_add_class(
+		gtk_widget_get_style_context(GTK_WIDGET(na_common->annotation_dialog)),
+		"nautilus-annotations"
+	);
+
+	gtk_style_context_add_class(
+		gtk_widget_get_style_context(text_view),
+		"nautilus-textarea-annotations"
+	);
+
 	gtk_window_set_modal(
 		GTK_WINDOW(na_common->annotation_dialog),
 		true
+	);
+
+	gtk_window_set_transient_for(
+		GTK_WINDOW(na_common->annotation_dialog),
+		na_common->main_window
 	);
 
 	gchar
@@ -431,10 +471,13 @@ static void show_annotations (
 
 	gtk_widget_set_vexpand(text_view, true);
 	gtk_widget_set_hexpand(text_view, true);
+
 	gtk_container_add(GTK_CONTAINER(scrollable), text_view);
 
 	gtk_container_add(
-		GTK_CONTAINER(gtk_dialog_get_content_area(na_common->annotation_dialog)),
+		GTK_CONTAINER(
+			gtk_dialog_get_content_area(na_common->annotation_dialog)
+		),
 		scrollable
 	);
 
@@ -448,7 +491,7 @@ static void show_annotations (
 	g_signal_connect(
 		na_common->source_buffer,
 		"modified-changed",
-		G_CALLBACK(user_has_changed_text),
+		G_CALLBACK(on_text_modified_state_change),
 		na_common
 	);
 
@@ -458,7 +501,8 @@ static void show_annotations (
 
 }
 
-NautilusAnnotationsCommon * na_common_allocate_blank (
+
+static NautilusAnnotationsCommon * na_common_allocate_blank (
 	GtkWindow * const window,
 	GList * const file_selection,
 	GtkSourceBuffer * const source_buffer
@@ -505,11 +549,12 @@ static void nautilus_annotations_unannotate (
 
 	}
 
-	NautilusAnnotationsCommon * const na_common = na_common_allocate_blank(
-		GTK_WINDOW(user_data),
-		nautilus_file_info_list_copy(file_selection),
-		NULL
-	);
+	NautilusAnnotationsCommon * const na_common =
+		na_common_allocate_blank(
+			GTK_WINDOW(user_data),
+			nautilus_file_info_list_copy(file_selection),
+			NULL
+		);
 
 	if (!na_common) {
 
@@ -527,8 +572,10 @@ static void nautilus_annotations_unannotate (
 		G_CALLBACK(destroy_na_common),
 		g_dngettext(
 			GETTEXT_PACKAGE,
-			"Do you really want to remove the annotations from the selected file?",
-			"Do you really want to remove all annotations from the selected files?",
+			"Do you really want to remove the annotations from the selected"
+				" file?",
+			"Do you really want to remove all annotations from the selected"
+				" files?",
 			g_list_length(file_selection)
 		),
 		GTK_WINDOW(user_data),
@@ -564,16 +611,17 @@ static void nautilus_annotations_annotate (
 	GError * get_err = NULL;
 	gchar * current_annotation = NULL;
 
-	NautilusAnnotationsCommon * const na_common = na_common_allocate_blank(
-		GTK_WINDOW(user_data),
-		nautilus_file_info_list_copy(file_selection),
-		gtk_source_buffer_new_with_language(
-			gtk_source_language_manager_get_language(
-				gtk_source_language_manager_get_default(),
-				"markdown"
+	NautilusAnnotationsCommon * const na_common =
+		na_common_allocate_blank(
+			GTK_WINDOW(user_data),
+			nautilus_file_info_list_copy(file_selection),
+			gtk_source_buffer_new_with_language(
+				gtk_source_language_manager_get_language(
+					gtk_source_language_manager_get_default(),
+					"markdown"
+				)
 			)
-		)
-	);
+		);
 
 	if (!na_common) {
 
@@ -666,30 +714,17 @@ static void nautilus_annotations_annotate (
 			strlen(current_annotation)
 		);
 
-		gtk_text_buffer_set_modified(GTK_TEXT_BUFFER(na_common->source_buffer), false);
+		gtk_text_buffer_set_modified(
+			GTK_TEXT_BUFFER(na_common->source_buffer),
+			false
+		);
+
 		gtk_source_buffer_end_not_undoable_action(na_common->source_buffer);
 		g_free(current_annotation);
 
 	}
 
 	show_annotations(na_common);
-
-}
-
-
-GType nautilus_annotations_get_type (void) {
-
-	return nautilus_annotations_type;
-
-}
-
-
-static void nautilus_annotations_class_init (
-	NautilusAnnotationsClass * const nautilus_annotations_class,
-	gpointer const class_data
-) {
-
-	parent_class = g_type_class_peek_parent(nautilus_annotations_class);
 
 }
 
@@ -846,6 +881,7 @@ NautilusOperationResult nautilus_annotations_update_file_info (
 
 	if (!finfo) {
 
+		/*  Cannot get file's annotations  */
 		return NAUTILUS_OPERATION_FAILED;
 
 	}
@@ -867,6 +903,16 @@ NautilusOperationResult nautilus_annotations_update_file_info (
 }
 
 
+static void nautilus_annotations_type_info_provider_iface_init (
+	NautilusInfoProviderIface * const iface,
+	gpointer const iface_data
+) {
+
+	iface->update_file_info = nautilus_annotations_update_file_info;
+
+}
+
+
 static void nautilus_annotations_menu_provider_iface_init (
 	NautilusMenuProviderIface * const iface,
 	gpointer const iface_data
@@ -877,12 +923,12 @@ static void nautilus_annotations_menu_provider_iface_init (
 }
 
 
-static void nautilus_annotations_type_info_provider_iface_init (
-	NautilusInfoProviderIface * const iface,
-	gpointer const iface_data
+static void nautilus_annotations_class_init (
+	NautilusAnnotationsClass * const nautilus_annotations_class,
+	gpointer const class_data
 ) {
 
-	iface->update_file_info = nautilus_annotations_update_file_info;
+	parent_class = g_type_class_peek_parent(nautilus_annotations_class);
 
 }
 
@@ -913,7 +959,8 @@ static void nautilus_annotations_register_type (
 	);
 
 	static const GInterfaceInfo type_info_provider_iface_info = {
-		(GInterfaceInitFunc) nautilus_annotations_type_info_provider_iface_init,
+		(GInterfaceInitFunc)
+			nautilus_annotations_type_info_provider_iface_init,
 		(GInterfaceFinalizeFunc) NULL,
 		NULL
 	};
@@ -941,6 +988,13 @@ static void nautilus_annotations_register_type (
 }
 
 
+GType nautilus_annotations_get_type (void) {
+
+	return nautilus_annotations_type;
+
+}
+
+
 void nautilus_module_initialize (
 	GTypeModule * const module
 ) {
@@ -948,20 +1002,38 @@ void nautilus_module_initialize (
 	I18N_INIT();
 	nautilus_annotations_register_type(module);
 	*provider_types = nautilus_annotations_get_type();
+	annotations_css = gtk_css_provider_new();
+
+	gtk_css_provider_load_from_path(
+		annotations_css,
+		NAUTILUS_ANNOTATIONS_CSS,
+		NULL
+	);
+
+	gtk_style_context_add_provider_for_screen(
+		gdk_display_get_default_screen(gdk_display_get_default()),
+		GTK_STYLE_PROVIDER(annotations_css),
+		GTK_STYLE_PROVIDER_PRIORITY_APPLICATION
+	);
 
 }
 
 
 void nautilus_module_shutdown (void) {
 
-	/*  Any module-specific shutdown  */
+	gtk_style_context_remove_provider_for_screen(
+		gdk_display_get_default_screen(gdk_display_get_default()),
+		GTK_STYLE_PROVIDER(annotations_css)
+	);
+
+	g_object_unref(annotations_css);
 
 }
 
 
 void nautilus_module_list_types (
-	const GType ** types,
-	int * num_types
+	const GType ** const types,
+	int * const num_types
 ) {
 
 	*types = provider_types;

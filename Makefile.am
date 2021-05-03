@@ -11,13 +11,17 @@ dist_doc_DATA = \
 	COPYING \
 	ChangeLog \
 	NEWS \
-	README
+	README \
+	docs/styling.md
 
-emblemsdir = $(datadir)/icons
-dist_emblems_DATA = \
-	plugin-data/annotate.svg \
-	plugin-data/emblem-annotations.svg \
-	plugin-data/unannotate.svg
+dist_pkgdata_DATA = \
+	extension-data/style.css
+
+iconsdir = $(datadir)/icons
+dist_icons_DATA = \
+	extension-data/annotate.svg \
+	extension-data/emblem-annotations.svg \
+	extension-data/unannotate.svg
 
 INTLTOOL_FILES = \
 	intltool-extract.in \
@@ -31,6 +35,7 @@ EXTRA_DIST = \
 	README.md \
 	bootstrap \
 	package.json \
+	.editorconfig \
 	$(INTLTOOL_FILES)
 
 DISTCLEANFILES = \

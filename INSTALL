@@ -33,5 +33,5 @@ This plugin depends on the following packages:
 * gtksourceview4
 * libnautilus-extension
 
-Make sure that they are present before compiling the source code.
+Please make sure that they are present before compiling the source code.
 

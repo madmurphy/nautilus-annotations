@@ -35,7 +35,7 @@ Emblems are managed by the extension and will not be shown once the extension
 is uninstalled. The content of the annotations instead is managed by **GIO**
 and will survive uninstalling the extension.
 
-It is possible to access annotations via command line by launching:
+It is possible to access the annotations via command line by launching:
 
 ``` sh
 gio info --attributes='metadata::annotation' /path/to/file

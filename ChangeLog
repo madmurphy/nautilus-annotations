@@ -2,6 +2,16 @@ Change Log
 ==========
 
 
+## 0.3.0 (2021-05-03)
+
+Changes:
+
+* The annotation window has become transient for Nautilus
+* A CSS has been created for styling the extension's graphical interface
+  (`/usr/share/nautilus-annotations/style.css`)
+* Documentation
+
+
 ## 0.2.0 (2021-05-02)
 
 Changes:
