@@ -1,6 +1,6 @@
 {
 	"name": "nautilus-annotations",
-	"version": "0.3.0",
+	"version": "0.3.1",
 	"description": "Annotate files and directories",
 	"homepage": "https://gitlab.gnome.org/madmurphy/nautilus-annotations",
 	"author": "madmurphy",
@@ -32,6 +32,7 @@
 		"gio",
 		"gnome",
 		"gtk",
+		"gtksourceview",
 		"gvfs",
 		"gvfs-metadata",
 		"markdown",

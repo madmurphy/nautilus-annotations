@@ -1,10 +1,10 @@
 /*
 
-Please bear in mind that this CSS affects the entire Nautilus window, not just
-the annotations dialog, so be careful with wildcard selectors.
+Please bear in mind that this CSS affects the entire screen, not just the
+annotations dialog, so be careful with wildcard selectors.
 
-For more information about the extension's DOM tree and all available
-selectors please see `/usr/share/doc/nautilus-annotations/styling.md`.
+For more information about Nautilus Annotations' DOM tree and all available
+selectors please refer to `/usr/share/doc/nautilus-annotations/styling.md`.
 
 */
 

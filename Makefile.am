@@ -17,11 +17,14 @@ dist_doc_DATA = \
 dist_pkgdata_DATA = \
 	extension-data/style.css
 
-iconsdir = $(datadir)/icons
-dist_icons_DATA = \
+svgactionsdir = $(datadir)/icons/hicolor/scalable/actions
+dist_svgactions_DATA = \
 	extension-data/annotate.svg \
-	extension-data/emblem-annotations.svg \
 	extension-data/unannotate.svg
+
+svgemblemsdir = $(datadir)/icons/hicolor/scalable/emblems
+dist_svgemblems_DATA = \
+	extension-data/emblem-annotations.svg
 
 INTLTOOL_FILES = \
 	intltool-extract.in \

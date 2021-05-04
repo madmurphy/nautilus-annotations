@@ -32,6 +32,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <glib.h>
 #include <nautilus-extension.h>
 #include <gtk/gtk.h>
@@ -74,19 +75,12 @@ typedef struct {
 	GList * file_selection;
 } NautilusAnnotationsCommon;
 
-typedef void (* OneParamFunc) (
-	gpointer user_data
-);
-
 static GType provider_types[1];
 static GType nautilus_annotations_type;
 static GObjectClass * parent_class;
 static GtkCssProvider * annotations_css;
 
-/*
-Many other possible key names would do, however `"metadata::annotation"` is the
-key that was originally used by Nautilus.
-*/
+/*  The metadata key that was originally used by Nautilus  */
 #ifndef G_FILE_ATTRIBUTE_METADATA_ANNOTATION
 #define G_FILE_ATTRIBUTE_METADATA_ANNOTATION "metadata::annotation"
 #endif
@@ -103,9 +97,9 @@ key that was originally used by Nautilus.
 \*/
 
 
-static void destroy_na_common (gpointer const user_data) {
+static void destroy_na_common (gpointer const v_na_common) {
 
-	#define na_common ((NautilusAnnotationsCommon *) user_data)
+	#define na_common ((NautilusAnnotationsCommon *) v_na_common)
 
 	if (na_common->annotation_dialog) {
 
@@ -114,7 +108,7 @@ static void destroy_na_common (gpointer const user_data) {
 	}
 
 	nautilus_file_info_list_free(na_common->file_selection);
-	free(user_data);
+	free(v_na_common);
 
 	#undef na_common
 
@@ -126,7 +120,7 @@ static void quick_ok_cancel (
 	GCallback const cb_cancel,
 	const char * const text_message,
 	GtkWindow * const parent,
-	gpointer const user_data
+	gpointer const data
 ) {
 
 	GtkWidget
@@ -163,15 +157,22 @@ static void quick_ok_cancel (
 
 	gtk_widget_show(question_label);
 
-	int response_id = gtk_dialog_run(GTK_DIALOG(question_dialog));
+	switch (
+		gtk_dialog_run(GTK_DIALOG(question_dialog)) == GTK_RESPONSE_OK ?
+			1 | (!cb_ok << 1)
+		:
+			0 | (!cb_cancel << 1)
+	) {
 
-	if (cb_ok && response_id == GTK_RESPONSE_OK) {
+		case 0: ((void (*) (gpointer)) cb_cancel)(data); break;
+		case 1: ((void (*) (gpointer)) cb_ok)(data);
 
-		((OneParamFunc) cb_ok)(user_data);
+		/*
 
-	} else if (cb_cancel && response_id != GTK_RESPONSE_OK) {
+		`case 2` ==> User chose "Cancel", but no callback is available
+		`case 3` ==> User chose "OK", but no callback is available
 
-		((OneParamFunc) cb_cancel)(user_data);
+		*/
 
 	}
 
@@ -182,10 +183,10 @@ static void quick_ok_cancel (
 
 static void on_text_modified_state_change (
 	GtkSourceBuffer * const text_buffer,
-	gpointer const user_data
+	gpointer const v_na_common
 ) {
 
-	#define na_common ((NautilusAnnotationsCommon *) user_data)
+	#define na_common ((NautilusAnnotationsCommon *) v_na_common)
 
 	switch (
 		(
@@ -212,6 +213,15 @@ static void on_text_modified_state_change (
 				)
 			);
 
+		/*
+
+		`case 1` ==> The `"modified"` bit flipped to `false` but for obscure
+			reasons the discard button was already gone
+		`case 2` ==> The `"modified"` bit flipped to `true` but for obscure
+			reasons the discard button was already there
+
+		*/
+
 	}
 
 	#undef na_common
@@ -220,10 +230,10 @@ static void on_text_modified_state_change (
 
 
 static void erase_annotations (
-	gpointer const user_data
+	gpointer const v_na_common
 ) {
 
-	#define na_common ((NautilusAnnotationsCommon *) user_data)
+	#define na_common ((NautilusAnnotationsCommon *) v_na_common)
 
 	GError * set_err = NULL;
 
@@ -261,19 +271,20 @@ static void erase_annotations (
 
 	}
 
-	destroy_na_common(user_data);
+	destroy_na_common(v_na_common);
 
 	#undef na_common
 
 }
 
+
 static void on_annotation_dialog_response (
 	GtkDialog * const dialog,
 	gint const response_id,
-	gpointer const user_data
+	gpointer const v_na_common
 ) {
 
-	#define na_common ((NautilusAnnotationsCommon *) user_data)
+	#define na_common ((NautilusAnnotationsCommon *) v_na_common)
 
 	if (
 		!gtk_text_buffer_get_modified(
@@ -309,7 +320,7 @@ static void on_annotation_dialog_response (
 			if (!*text_content) {
 
 				g_free(text_content);
-				erase_annotations(user_data);
+				erase_annotations(v_na_common);
 				return;
 
 			}
@@ -361,7 +372,7 @@ static void on_annotation_dialog_response (
 				NULL,
 				_("Are you sure you want to discard the current changes?"),
 				GTK_WINDOW(dialog),
-				user_data
+				v_na_common
 			);
 
 			return;
@@ -382,10 +393,10 @@ static void on_annotation_dialog_response (
 
 
 static void show_annotations (
-	gpointer const user_data
+	gpointer const v_na_common
 ) {
 
-	#define na_common ((NautilusAnnotationsCommon *) user_data)
+	#define na_common ((NautilusAnnotationsCommon *) v_na_common)
 
 	GtkWidget
 		* const scrollable =
@@ -530,11 +541,11 @@ static NautilusAnnotationsCommon * na_common_allocate_blank (
 
 static void nautilus_annotations_unannotate (
 	NautilusMenuItem * const menu_item,
-	gpointer const user_data
+	gpointer const v_window
 ) {
 
 	GList * const file_selection = g_object_get_data(
-		(GObject *) menu_item,
+		G_OBJECT(menu_item),
 		"nautilus_annotations_files"
 	);
 
@@ -551,7 +562,7 @@ static void nautilus_annotations_unannotate (
 
 	NautilusAnnotationsCommon * const na_common =
 		na_common_allocate_blank(
-			GTK_WINDOW(user_data),
+			GTK_WINDOW(v_window),
 			nautilus_file_info_list_copy(file_selection),
 			NULL
 		);
@@ -578,7 +589,7 @@ static void nautilus_annotations_unannotate (
 				" files?",
 			g_list_length(file_selection)
 		),
-		GTK_WINDOW(user_data),
+		GTK_WINDOW(v_window),
 		na_common
 	);
 
@@ -587,11 +598,11 @@ static void nautilus_annotations_unannotate (
 
 static void nautilus_annotations_annotate (
 	NautilusMenuItem * const menu_item,
-	gpointer const user_data
+	gpointer const v_window
 ) {
 
 	GList * const file_selection = g_object_get_data(
-		(GObject *) menu_item,
+		G_OBJECT(menu_item),
 		"nautilus_annotations_files"
 	);
 
@@ -613,7 +624,7 @@ static void nautilus_annotations_annotate (
 
 	NautilusAnnotationsCommon * const na_common =
 		na_common_allocate_blank(
-			GTK_WINDOW(user_data),
+			GTK_WINDOW(v_window),
 			nautilus_file_info_list_copy(file_selection),
 			gtk_source_buffer_new_with_language(
 				gtk_source_language_manager_get_language(
@@ -687,7 +698,7 @@ static void nautilus_annotations_annotate (
 					"At least two annotations in the file selection differ.\n"
 					"This will set up a blank new note."
 				),
-				GTK_WINDOW(user_data),
+				GTK_WINDOW(v_window),
 				na_common
 			);
 			return;
@@ -789,7 +800,7 @@ static GList * nautilus_annotations_get_file_items (
 			);
 
 			g_object_set_data_full(
-				(GObject *) menu_item,
+				G_OBJECT(menu_item),
 				"nautilus_annotations_files",
 				nautilus_file_info_list_copy(file_selection),
 				(GDestroyNotify) nautilus_file_info_list_free
@@ -853,7 +864,7 @@ static GList * nautilus_annotations_get_file_items (
 	);
 
 	g_object_set_data_full(
-		(GObject *) menu_item,
+		G_OBJECT(menu_item),
 		"nautilus_annotations_files",
 		nautilus_file_info_list_copy(file_selection),
 		(GDestroyNotify) nautilus_file_info_list_free

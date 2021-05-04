@@ -31,9 +31,10 @@ synchronized with the new path.
 Annotations are “per user”. That means that although Alice has the right to
 annotate Bob's files, only Alice will have access to her own annotations.
 
-Emblems are managed by the extension and will not be shown once the extension
-is uninstalled. The content of the annotations instead is managed by **GIO**
-and will survive uninstalling the extension.
+Emblems are displayed by the extension and will not be shown once the extension
+is uninstalled (the `metadata::emblems` database entry for the file is left
+untouched). The content of the annotations instead is managed by **GIO** and
+will survive uninstalling the extension.
 
 It is possible to access the annotations via command line by launching:
 
