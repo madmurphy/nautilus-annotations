@@ -2,6 +2,18 @@ NEWS
 ====
 
 
+## 0.4.0
+
+* It is now possible to use Nautilus' background menu to annotate the location
+  currently displayed
+* The home path in the window's title is now replaced with a tilde
+* Multiple actions, when available, are now gathered in one single sub-menu
+* Automatic text wrapping has been added to the text area (long lines are
+  broken in between words)
+* The confirmation dialog windows for destructive actions have been decorated
+  according to Nautilus' style
+
+
 ## 0.3.0
 
 * The annotation window has become transient for Nautilus

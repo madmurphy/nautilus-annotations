@@ -1,7 +1,7 @@
 /*
 
 Please bear in mind that this CSS affects the entire screen, not just the
-annotations dialog, so be careful with wildcard selectors.
+annotations window, so be careful with wildcard selectors.
 
 For more information about Nautilus Annotations' DOM tree and all available
 selectors please refer to `/usr/share/doc/nautilus-annotations/styling.md`.
@@ -10,8 +10,4 @@ selectors please refer to `/usr/share/doc/nautilus-annotations/styling.md`.
 
 textview.nautilus-textarea-annotations {
 	font-family: monospace;
-}
-
-label.nautilus-question-annotations {
-	margin: 16px;
 }

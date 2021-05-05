@@ -1,12 +1,11 @@
 Styling
 =======
 
-**Nautilus Annotations** provides four CSS classes:
+**Nautilus Annotations** provides three CSS classes:
 
 * `dialog.nautilus-annotations` (the annotation window)
 * `textview.nautilus-textarea-annotations` (the annotation text area)
-* `dialog.nautilus-okcancel-annotations` (the window asking questions)
-* `label.nautilus-question-annotations` (the label containing questions)
+* `button.nautilus-discard-annotations` (the annotation text area)
 
 The classes above are meant to be used in the first place by the extension's
 main CSS (`/usr/share/nautilus-annotations/style.css`), but can be completed
@@ -37,38 +36,7 @@ Widgets without a class can be styled via CSS inheritance. The
 	        │
 	        ╰── buttonbox.dialog-action-area
 	            │
-	            ╰── button.text-button
-	                │
-	                ╰── label
-
-The `dialog.nautilus-okcancel-annotations` window is populated with the
-following DOM tree:
-
-	dialog.nautilus-okcancel-annotations
-	│
-	├── headerbar.titlebar
-	│   │
-	│   ├── box
-	│   │   │
-	│   │   ╰── label.title
-	│   │
-	│   ╰── box
-	│       │
-	│       ╰── button.titlebutton.close
-	│
-	╰── box.dialog-vbox
-	    │
-	    │── label.nautilus-question-annotations
-	    │
-	    ╰── box.dialog-action-box
-	        │
-	        ╰── buttonbox.dialog-action-area
-	            │
-	            ├── button.text-button.default
-	            │   │
-	            │   ╰── label
-	            │
-	            ╰── button.text-button
+	            ╰── button.text-button.nautilus-discard-annotations
 	                │
 	                ╰── label
 
