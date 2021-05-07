@@ -9,7 +9,7 @@ dnl  ***************************************************************************
 AC_PREREQ([2.69])
 
 AC_INIT([Nautilus Annotations],
-	[0.4.0],
+	[0.4.1],
 	[madmurphy333@gmail.com],
 	[nautilus-annotations],
 	[https://gitlab.gnome.org/madmurphy/nautilus-annotations])

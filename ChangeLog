@@ -2,6 +2,16 @@ Change Log
 ==========
 
 
+## 0.4.1 (2021-05-07)
+
+Changes:
+
+* Annotations window's default width has become bigger
+* Tilde replacement in the window's title has been extended to other users'
+  home directories (e.g., `~john/doc.md`, `~lisa/Videos`, etc.)
+* Code review
+
+
 ## 0.4.0 (2021-05-06)
 
 Changes:
