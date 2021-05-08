@@ -82,7 +82,9 @@ i18n-update:
 	&& mkdir -p 'backups' && grep -o '^\s*\w\S\+' 'LINGUAS' | while read \
 	coin; do mv "$${coin}.po" "$${coin}.po.bak" && msgmerge \
 	"$${coin}.po.bak" '$(PACKAGE_TARNAME).pot' > "$${coin}.po" && mv \
-	"$${coin}.po.bak" 'backups'; done; rm '$(PACKAGE_TARNAME).pot')
+	"$${coin}.po.bak" 'backups' && sed -i \
+	's/"Project-Id-Version:\s*\([0-9]\+\(\.[0-9]\+\(\.[0-9]\)\?\)\?\)\?\+\\n"/"Project-Id-Version: @PACKAGE_VERSION@\\n"/' \
+	"$${coin}.po"; done; rm '$(PACKAGE_TARNAME).pot')
 
 
 # EOF

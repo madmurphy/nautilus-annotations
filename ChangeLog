@@ -2,6 +2,16 @@ Change Log
 ==========
 
 
+## 0.5.0 (2021-05-08)
+
+Changes:
+
+* The action button in the annotations window has been moved to the header bar
+* The file's path has become the window's subtitle
+* Code review
+* Documentation
+
+
 ## 0.4.1 (2021-05-07)
 
 Changes:

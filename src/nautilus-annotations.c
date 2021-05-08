@@ -107,7 +107,7 @@ static GtkCssProvider * annotations_css;
 \*/
 
 
-static void session_destroy (
+static void edit_session_destroy (
 	NautilusAnnotationsSession * const session
 ) {
 
@@ -118,49 +118,11 @@ static void session_destroy (
 }
 
 
-static NautilusAnnotationsSession * session_allocate (
-	GtkWindow * const window,
-	GList * const file_selection
-) {
-
-	NautilusAnnotationsSession * const
-		session = g_try_malloc(sizeof(NautilusAnnotationsSession));
-
-	if (session) {
-
-		*session = (NautilusAnnotationsSession) {
-			.main_window = window,
-			.annotation_dialog = GTK_DIALOG(gtk_dialog_new()),
-			.annotation_text = gtk_source_buffer_new_with_language(
-				gtk_source_language_manager_get_language(
-					gtk_source_language_manager_get_default(),
-					"markdown"
-				)
-			),
-			.discard_button = NULL,
-			.file_selection = nautilus_file_info_list_copy(file_selection)
-		};
-
-	} else {
-
-		fprintf(
-			stderr,
-			"Nautilus Annotations: %s\n",
-			_("Error allocating memory")
-		);
-
-	}
-
-	return session;
-
-}
-
-
 static bool destructive_action_confirm (
 	GtkWindow * const parent,
 	const char * const primary_text,
 	const char * const secondary_text,
-	const char * const destructive_text
+	/*  nullable  */  const char * const destructive_text
 ) {
 
 	GtkDialog * const question_dialog =
@@ -169,17 +131,13 @@ static bool destructive_action_confirm (
 				parent,
 				0,
 				GTK_MESSAGE_QUESTION,
-				GTK_BUTTONS_CANCEL,
+				destructive_text ?
+					GTK_BUTTONS_CANCEL
+				:
+					GTK_BUTTONS_OK_CANCEL,
 				"%s",
 				primary_text
 			)
-		);
-
-	GtkWidget * const destructive_button =
-		gtk_dialog_add_button(
-			question_dialog,
-			destructive_text,
-			GTK_RESPONSE_OK
 		);
 
 	gtk_message_dialog_format_secondary_text(
@@ -187,6 +145,19 @@ static bool destructive_action_confirm (
 		"%s",
 		secondary_text
 	);
+
+	GtkWidget * const destructive_button =
+		destructive_text ?
+			gtk_dialog_add_button(
+				question_dialog,
+				destructive_text,
+				GTK_RESPONSE_OK
+			)
+		:
+			gtk_dialog_get_widget_for_response(
+				question_dialog,
+				GTK_RESPONSE_OK
+			);
 
 	gtk_dialog_set_default_response(
 		question_dialog,
@@ -212,7 +183,7 @@ static void erase_annotations (
 ) {
 
 	GFile * location;
-	GError * set_err = NULL;
+	GError * eraserr = NULL;
 
 	for (GList * iter = file_selection; iter; iter = iter->next) {
 
@@ -221,31 +192,31 @@ static void erase_annotations (
 		);
 
 		if (
-			!g_file_set_attribute(
+			g_file_set_attribute(
 				location,
 				G_FILE_ATTRIBUTE_METADATA_ANNOTATION,
 				G_FILE_ATTRIBUTE_TYPE_INVALID,
 				NULL,
 				G_FILE_QUERY_INFO_NONE,
 				NULL,
-				&set_err
+				&eraserr
 			)
 		) {
+
+			nautilus_file_info_invalidate_extension_info(
+				NAUTILUS_FILE_INFO(iter->data)
+			);
+
+		} else {
 
 			fprintf(
 				stderr,
 				"Nautilus Annotations: %s // %s\n",
 				_("Could not erase file's annotations"),
-				set_err->message
+				eraserr->message
 			);
 
-			g_clear_error(&set_err);
-
-		} else {
-
-			nautilus_file_info_invalidate_extension_info(
-				NAUTILUS_FILE_INFO(iter->data)
-			);
+			g_clear_error(&eraserr);
 
 		}
 
@@ -277,7 +248,7 @@ static void on_annotation_dialog_response (
 	GtkTextIter text_start, text_end;
 	gchar * text_content;
 	GFile * location;
-	GError * set_err = NULL;
+	GError * saverr = NULL;
 
 	switch (response_id) {
 
@@ -315,30 +286,30 @@ static void on_annotation_dialog_response (
 				);
 
 				if (
-					!g_file_set_attribute_string(
+					g_file_set_attribute_string(
 						location,
 						G_FILE_ATTRIBUTE_METADATA_ANNOTATION,
 						text_content,
 						G_FILE_QUERY_INFO_NONE,
 						NULL,
-						&set_err
+						&saverr
 					)
 				) {
+
+					nautilus_file_info_invalidate_extension_info(
+						NAUTILUS_FILE_INFO(iter->data)
+					);
+
+				} else {
 
 					fprintf(
 						stderr,
 						"Nautilus Annotations: %s // %s\n",
 						_("Could not save file's annotations"),
-						set_err->message
+						saverr->message
 					);
 
-					g_clear_error(&set_err);
-
-				} else {
-
-					nautilus_file_info_invalidate_extension_info(
-						NAUTILUS_FILE_INFO(iter->data)
-					);
+					g_clear_error(&saverr);
 
 				}
 
@@ -372,7 +343,7 @@ static void on_annotation_dialog_response (
 	 \/     ______________________     \ */
 
 
-	session_destroy(session);
+	edit_session_destroy(session);
 
 	#undef session
 
@@ -431,9 +402,72 @@ static void on_text_modified_state_change (
 }
 
 
-static void show_annotations (
-	NautilusAnnotationsSession * const session
+static void edit_session_begin (
+	GtkWindow * const window,
+	GList * const file_selection,
+	/*  nullable  */  gchar * initial_content
 ) {
+
+	NautilusAnnotationsSession * const
+		session = g_try_malloc(sizeof(NautilusAnnotationsSession));
+
+	if (!session) {
+
+		fprintf(
+			stderr,
+			"Nautilus Annotations: %s\n",
+			_("Error allocating memory")
+		);
+
+		return;
+
+	}
+
+	GtkDialog * anndialog = GTK_DIALOG(
+		g_object_new(
+			GTK_TYPE_DIALOG,
+			"use-header-bar",
+			true,
+			NULL
+		)
+	);
+
+	*session = (NautilusAnnotationsSession) {
+		.main_window = window,
+		.annotation_dialog = anndialog,
+		.annotation_text = gtk_source_buffer_new_with_language(
+			gtk_source_language_manager_get_language(
+				gtk_source_language_manager_get_default(),
+				"markdown"
+			)
+		),
+		.discard_button = NULL,
+		.file_selection = nautilus_file_info_list_copy(file_selection)
+	};
+
+	if (initial_content) {
+
+		gtk_source_buffer_begin_not_undoable_action(session->annotation_text);
+
+		gtk_text_buffer_set_text(
+			GTK_TEXT_BUFFER(session->annotation_text),
+			initial_content,
+			strlen(initial_content)
+		);
+
+		gtk_text_buffer_set_modified(
+			GTK_TEXT_BUFFER(session->annotation_text),
+			false
+		);
+
+		gtk_source_buffer_end_not_undoable_action(session->annotation_text);
+
+	}
+
+	gtk_style_context_add_class(
+		gtk_widget_get_style_context(GTK_WIDGET(anndialog)),
+		"nautilus-dialog-annotations"
+	);
 
 	GtkWidget
 		* const scrollable =
@@ -442,34 +476,33 @@ static void show_annotations (
 			gtk_source_view_new_with_buffer(session->annotation_text);
 
 	gtk_style_context_add_class(
-		gtk_widget_get_style_context(GTK_WIDGET(session->annotation_dialog)),
-		"nautilus-annotations"
-	);
-
-	gtk_style_context_add_class(
 		gtk_widget_get_style_context(text_area),
 		"nautilus-textarea-annotations"
 	);
 
 	gtk_window_set_modal(
-		GTK_WINDOW(session->annotation_dialog),
+		GTK_WINDOW(anndialog),
 		true
 	);
 
 	gtk_window_set_transient_for(
-		GTK_WINDOW(session->annotation_dialog),
-		session->main_window
+		GTK_WINDOW(anndialog),
+		window
 	);
 
+	const gchar
+		* header_title = _("Annotations");
+
 	gchar
-		* specific_title = NULL,
-		* generic_title = _("Annotations");
+		* header_subtitle = _("Unknown path"),
+		* pathbuf = NULL;
 
 	if (session->file_selection) {
 
 		if (session->file_selection->next) {
 
-			generic_title = _("Annotations shared between multiple files");
+			header_title = _("Shared annotations");
+			header_subtitle = _("(multiple objects)");
 
 		} else {
 
@@ -477,89 +510,70 @@ static void show_annotations (
 				NAUTILUS_FILE_INFO(session->file_selection->data)
 			);
 
-			gchar
-				* shown_path,
-				* const fpath = g_file_get_path(location);
-
+			pathbuf = g_file_get_path(location);
 			g_object_unref(location);
 
-			if ((shown_path = fpath)) {
+			if ((header_subtitle = pathbuf)) {
 
 				const gchar * const homedir = g_get_home_dir();
 
-				if (homedir && *homedir && g_str_has_prefix(fpath, homedir)) {
+				if (homedir && *homedir && g_str_has_prefix(pathbuf, homedir)) {
 
 					/*  Current user (`~/doc.md`, `~/Videos`, etc.)  */
-					*(shown_path += strlen(homedir) - 1) = '~';
+					*(header_subtitle += strlen(homedir) - 1) = '~';
 
-				} else if (g_str_has_prefix(fpath, "/home")) {
+				} else if (g_str_has_prefix(pathbuf, "/home")) {
 
 					/*  Other users (`~john/doc.md`, `~lisa/Videos`, etc.)  */
-					*(shown_path += sizeof("/home") - 1) = '~';
+					*(header_subtitle += sizeof("/home") - 1) = '~';
 
-				} else if (g_str_has_prefix(fpath, "/root")) {
+				} else if (g_str_has_prefix(pathbuf, "/root")) {
 
 					/*  Super user (`~root/doc.md`, `~root/Videos`, etc.)  */
-					*shown_path = '~';
+					*header_subtitle = '~';
 
 				}
 
-			} else {
-
-				shown_path = "???";
-
 			}
-
-			specific_title = g_strconcat(
-				shown_path,
-				"\342\200\202" "\342\200\223" "\342\200\202",
-				generic_title,
-				NULL
-			);
-
-			g_free(fpath);
 
 		}
 
 	}
 
 	gtk_window_set_title(
-		GTK_WINDOW(session->annotation_dialog),
-		specific_title ? specific_title : generic_title
+		GTK_WINDOW(anndialog),
+		header_title
 	);
 
-	g_free(specific_title);
+	gtk_header_bar_set_subtitle(
+		GTK_HEADER_BAR(
+			gtk_window_get_titlebar(
+				GTK_WINDOW(anndialog)
+			)
+		),
+		header_subtitle
+	);
+
+	g_free(pathbuf);
 
 	GdkRectangle workarea = { 0 };
 
 	gdk_monitor_get_workarea(
 		gdk_display_get_monitor_at_window(
 			gdk_display_get_default(),
-			gtk_widget_get_window(GTK_WIDGET(session->main_window))
+			gtk_widget_get_window(GTK_WIDGET(window))
 		),
 		&workarea
 	);
 
 	gtk_window_set_default_size(
-		GTK_WINDOW(session->annotation_dialog),
+		GTK_WINDOW(anndialog),
 		workarea.width ? workarea.width * 2 / 3 : 300,
 		workarea.height ? workarea.height * 2 / 3 : 400
 	);
 
-	gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(text_area), GTK_WRAP_WORD);
-	gtk_widget_set_vexpand(text_area, true);
-	gtk_widget_set_hexpand(text_area, true);
-	gtk_container_add(GTK_CONTAINER(scrollable), text_area);
-
-	gtk_container_add(
-		GTK_CONTAINER(
-			gtk_dialog_get_content_area(session->annotation_dialog)
-		),
-		scrollable
-	);
-
 	g_signal_connect(
-		session->annotation_dialog,
+		anndialog,
 		"response",
 		G_CALLBACK(on_annotation_dialog_response),
 		session
@@ -572,7 +586,138 @@ static void show_annotations (
 		session
 	);
 
-	gtk_widget_show_all(GTK_WIDGET(session->annotation_dialog));
+	gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(text_area), GTK_WRAP_WORD);
+	gtk_widget_set_vexpand(text_area, true);
+	gtk_widget_set_hexpand(text_area, true);
+	gtk_container_add(GTK_CONTAINER(scrollable), text_area);
+
+	gtk_container_add(
+		GTK_CONTAINER(
+			gtk_dialog_get_content_area(anndialog)
+		),
+		scrollable
+	);
+
+	gtk_widget_show_all(GTK_WIDGET(anndialog));
+
+}
+
+
+static void nautilus_annotations_annotate (
+	NautilusMenuItem * const menu_item,
+	gpointer const v_window
+) {
+
+	GList * const file_selection = g_object_get_data(
+		G_OBJECT(menu_item),
+		"nautilus_annotations_files"
+	);
+
+	if (!file_selection) {
+
+		fprintf(
+			stderr,
+			"Nautilus Annotations: %s\n",
+			_("No files were selected to be annotated")
+		);
+
+		return;
+
+	}
+
+	const char * annotation_probe;
+	gchar * current_annotation = NULL;
+	GFile * location;
+	GFileInfo * finfo;
+	GError * loaderr = NULL;
+
+	for (GList * iter = file_selection; iter; iter = iter->next) {
+
+		location = nautilus_file_info_get_location(
+			NAUTILUS_FILE_INFO(iter->data)
+		);
+
+		finfo = g_file_query_info(
+			location,
+			G_FILE_ATTRIBUTE_METADATA_ANNOTATION,
+			G_FILE_QUERY_INFO_NONE,
+			NULL,
+			&loaderr
+		);
+
+		g_object_unref(location);
+
+		if (!finfo) {
+
+			fprintf(
+				stderr,
+				"Nautilus Annotations: %s // %s\n",
+				_("Could not access file's annotations"),
+				loaderr->message
+			);
+
+			g_clear_error(&loaderr);
+			return;
+
+		}
+
+		annotation_probe = g_file_info_get_attribute_string(
+			finfo,
+			G_FILE_ATTRIBUTE_METADATA_ANNOTATION
+		);
+
+		if (!annotation_probe) {
+
+			goto unref_and_continue;
+
+		}
+
+		if (!current_annotation) {
+
+			current_annotation = g_strdup(annotation_probe);
+			goto unref_and_continue;
+
+		}
+
+		if (strcmp(annotation_probe, current_annotation)) {
+
+			g_object_unref(finfo);
+			g_clear_pointer(&current_annotation, g_free);
+
+			if (
+				destructive_action_confirm(
+					GTK_WINDOW(v_window),
+					_("At least two annotations in the file selection differ"),
+					_("This will set up a blank new annotation."),
+					NULL  /*  `NULL` defaults to `"_OK"`  */
+				)
+			) {
+
+				break;
+
+			}
+
+			return;
+
+		}
+
+
+		/* \                                /\
+		\ */     unref_and_continue:       /* \
+		 \/     ______________________     \ */
+
+
+		g_object_unref(finfo);
+
+	}
+
+	edit_session_begin(
+		GTK_WINDOW(v_window),
+		file_selection,
+		current_annotation
+	);
+
+	g_free(current_annotation);
 
 }
 
@@ -615,152 +760,8 @@ static void nautilus_annotations_unannotate (
 }
 
 
-static void nautilus_annotations_annotate (
-	NautilusMenuItem * const menu_item,
-	gpointer const v_window
-) {
-
-	GList * const file_selection = g_object_get_data(
-		G_OBJECT(menu_item),
-		"nautilus_annotations_files"
-	);
-
-	if (!file_selection) {
-
-		fprintf(
-			stderr,
-			"Nautilus Annotations: %s\n",
-			_("No files were selected to be annotated")
-		);
-
-		return;
-
-	}
-
-	const char * annotation_probe;
-	gchar * current_annotation = NULL;
-	GFile * location;
-	GFileInfo * finfo;
-	GError * get_err = NULL;
-
-	for (GList * iter = file_selection; iter; iter = iter->next) {
-
-		location = nautilus_file_info_get_location(
-			NAUTILUS_FILE_INFO(iter->data)
-		);
-
-		finfo = g_file_query_info(
-			location,
-			G_FILE_ATTRIBUTE_METADATA_ANNOTATION,
-			G_FILE_QUERY_INFO_NONE,
-			NULL,
-			&get_err
-		);
-
-		g_object_unref(location);
-
-		if (!finfo) {
-
-			fprintf(
-				stderr,
-				"Nautilus Annotations: %s // %s\n",
-				_("Could not access file's annotations"),
-				get_err->message
-			);
-
-			g_clear_error(&get_err);
-			return;
-
-		}
-
-		annotation_probe = g_file_info_get_attribute_string(
-			finfo,
-			G_FILE_ATTRIBUTE_METADATA_ANNOTATION
-		);
-
-		if (!annotation_probe) {
-
-			goto unref_and_continue;
-
-		}
-
-		if (!current_annotation) {
-
-			current_annotation = g_strdup(annotation_probe);
-			goto unref_and_continue;
-
-		}
-
-		if (strcmp(annotation_probe, current_annotation)) {
-
-			g_object_unref(finfo);
-			g_clear_pointer(&current_annotation, g_free);
-
-			if (
-				destructive_action_confirm(
-					GTK_WINDOW(v_window),
-					_("At least two annotations in the file selection differ"),
-					_("This will set up a blank new annotation."),
-					_("_OK")
-				)
-			) {
-
-				break;
-
-			}
-
-			return;
-
-		}
-
-
-		/* \                                /\
-		\ */     unref_and_continue:       /* \
-		 \/     ______________________     \ */
-
-
-		g_object_unref(finfo);
-
-	}
-
-	NautilusAnnotationsSession * const session = session_allocate(
-		GTK_WINDOW(v_window),
-		file_selection
-	);
-
-	if (!session) {
-
-		return;
-
-	}
-
-	if (current_annotation) {
-
-		gtk_source_buffer_begin_not_undoable_action(session->annotation_text);
-
-		gtk_text_buffer_set_text(
-			GTK_TEXT_BUFFER(session->annotation_text),
-			current_annotation,
-			strlen(current_annotation)
-		);
-
-		gtk_text_buffer_set_modified(
-			GTK_TEXT_BUFFER(session->annotation_text),
-			false
-		);
-
-		gtk_source_buffer_end_not_undoable_action(session->annotation_text);
-		g_free(current_annotation);
-
-	}
-
-	show_annotations(session);
-
-}
-
-
 static GList * nautilus_annotations_get_file_items (
-	NautilusMenuProvider * const provider,
+	NautilusMenuProvider * const menu_provider,
 	GtkWidget * const window,
 	GList * const file_selection
 ) {
@@ -981,16 +982,16 @@ static GList * nautilus_annotations_get_file_items (
 }
 
 
-GList * nautilus_annotations_get_background_items(
-	NautilusMenuProvider * provider,
-	GtkWidget * window,
-	NautilusFileInfo * current_folder
+GList * nautilus_annotations_get_background_items (
+	NautilusMenuProvider * const menu_provider,
+	GtkWidget * const window,
+	NautilusFileInfo * const current_folder
 ) {
 
 	GList
 		* file_selection = g_list_append(NULL, current_folder),
 		* menu_items = nautilus_annotations_get_file_items(
-			provider,
+			menu_provider,
 			window,
 			file_selection
 		);
@@ -1003,7 +1004,7 @@ GList * nautilus_annotations_get_background_items(
 
 
 NautilusOperationResult nautilus_annotations_update_file_info (
-	NautilusInfoProvider * const provider,
+	NautilusInfoProvider * const info_provider,
 	NautilusFileInfo * const file,
 	GClosure * const update_complete,
 	NautilusOperationHandle ** const handle

@@ -12,7 +12,7 @@ annotations attached to files and directories. This ability has slowly gone
 lost in the folds of time. Things however are rarely really unlearned, and an
 ability rarely goes away for good.
 
-**Nautilus Annotations** brings back Nautilus' annotation capabilities. It
+**Nautilus Annotations** brings back **Nautilus**' annotation capabilities. It
 exploits the same machinery that was used back then: that of relying on **GIO**
 to store custom information about a file or a directory.
 
