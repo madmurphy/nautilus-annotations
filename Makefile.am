@@ -12,6 +12,7 @@ dist_doc_DATA = \
 	ChangeLog \
 	NEWS \
 	README \
+	docs/shortcuts.md \
 	docs/styling.md
 
 dist_pkgdata_DATA = \

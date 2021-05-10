@@ -36,16 +36,23 @@ is uninstalled (the `metadata::emblems` database entry for the file is left
 untouched). The content of the annotations instead is managed by **GIO** and
 will survive uninstalling the extension.
 
-It is possible to access the annotations via command line by launching:
+Annotations are stored under `~/.local/share/gvfs-metadata`. It is possible to
+access them via command line by launching:
 
 ``` sh
-gio info --attributes='metadata::annotation' /path/to/file
+gio info -a 'metadata::annotation' /path/to/file
 ```
 
-For setting an annotation via command line launch instead:
+To set an annotation via command line launch:
 
 ``` sh
 gio set /path/to/file 'metadata::annotation' 'Content of annotation goes here'
+```
+
+To unset an annotation via command line launch:
+
+``` sh
+gio set -t unset /path/to/file 'metadata::annotation'
 ```
 
 
@@ -62,9 +69,9 @@ Then clone this repository and launch the following four commands:
 
 ``` sh
 cd nautilus-annotations/po
-intltool-update -p
+intltool-update -p --gettext-package=nautilus-annotations
 msginit -l nl
-rm NautilusAnnotations.pot
+rm nautilus-annotations.pot
 ```
 
 Now edit the `po/LINGUAS` file and add a new line containing the abbreviated
@@ -78,9 +85,9 @@ in the extension source code, launch
 
 ``` sh
 cd nautilus-annotations/po
-intltool-update -p
-mv nl.po nl.po.bak && msgmerge nl.po.bak NautilusAnnotations.pot > nl.po
-rm NautilusAnnotations.pot nl.po.bak
+intltool-update -p --gettext-package=nautilus-annotations
+mv nl.po nl.po.bak && msgmerge nl.po.bak nautilus-annotations.pot > nl.po
+rm nautilus-annotations.pot nl.po.bak
 ```
 
 For any issue, [drop me a message][1].
@@ -92,9 +99,11 @@ Installation
 On most Unix-like systems, you should be able to install this package using the
 following common steps:
 
-    ./configure
-    make
-    make install-strip
+``` sh
+./configure
+make
+make install-strip
+```
 
 If the `strip` utility is not available on your machine, use `make install`
 instead (it will produce larger binaries).
@@ -118,9 +127,9 @@ generator.
 Free software
 -------------
 
-This extension is free software. You can redistribute it and/or modify it under
-the terms of the GPL license version 3 or any later version. See [COPYING][4]
-for details.
+**Nautilus Annotations** is free software. You can redistribute it and/or
+modify it under the terms of the GPL license version 3 or any later version.
+See [COPYING][4] for details.
 
 
   [1]: https://gitlab.gnome.org/madmurphy/nautilus-annotations/issues

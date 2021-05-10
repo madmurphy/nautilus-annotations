@@ -3,11 +3,11 @@
 Please bear in mind that this CSS affects the entire screen, not just the
 annotations window, so be careful with wildcard selectors.
 
-For more information about Nautilus Annotations' DOM tree and all available
+For information about Nautilus Annotations' DOM tree and all available
 selectors please refer to `/usr/share/doc/nautilus-annotations/styling.md`.
 
 */
 
-textview.nautilus-textarea-annotations {
+textview.nautilus-annotations-view {
 	font-family: monospace;
 }

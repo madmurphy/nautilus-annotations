@@ -2,6 +2,14 @@ NEWS
 ====
 
 
+## 0.6.0
+
+* Two new keyboard shortcuts have been created (`Ctrl` + `S` and `Shift` +
+  `Esc`)
+* All keyboard shortcuts -- both inherited and extension-specific ones -- are
+  now documented in `/usr/share/doc/nautilus-annotations/shortcuts.md`
+
+
 ## 0.5.0
 
 * The action button in the annotations window has been moved to the header bar

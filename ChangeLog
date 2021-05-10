@@ -2,6 +2,19 @@ Change Log
 ==========
 
 
+## 0.6.0 (2021-05-10)
+
+Changes:
+
+* Two new keyboard shortcuts have been created (`Ctrl` + `S` and `Shift` +
+  `Esc`)
+* All keyboard shortcuts -- both inherited and extension-specific ones -- are
+  now documented in `/usr/share/doc/nautilus-annotations/shortcuts.md`
+* CSS class names have changed
+* Code review
+* Documentation
+
+
 ## 0.5.0 (2021-05-08)
 
 Changes:
