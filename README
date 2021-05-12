@@ -28,7 +28,7 @@ and with Markdown highlighting enabled.
 Thanks to **GIO**, when a file is moved or renamed its annotations remain
 synchronized with the new path.
 
-Annotations are “per user”. That means that although Alice has the right to
+Annotations are “per user”. This means that although Alice has the right to
 annotate Bob's files, only Alice will have access to her own annotations.
 
 Emblems are displayed by the extension and will not be shown once the extension

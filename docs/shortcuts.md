@@ -8,7 +8,7 @@ Keyboard shortcuts
 * `Ctrl` + `Z`: Undo
 * `Ctrl` + `Shift` + `Z`: Redo
 * `Ctrl` + `Shift` + `DecimalPoint`: Insert an emoji
-* `Ctrl` + `S`: Save current annotations
-* `Esc`: Save current annotations and leave
-* `Shift` + `Esc`: Discard current annotations and leave
+* `Ctrl` + `S`: Save the current annotations
+* `Esc`: Save the current annotations and leave
+* `Shift` + `Esc`: Discard the current annotations and leave
 

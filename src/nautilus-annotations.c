@@ -32,7 +32,6 @@
 
 #include <stdbool.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <glib.h>
 #include <gtk/gtk.h>
@@ -220,7 +219,7 @@ static void annotation_session_destroy (
 }
 
 
-guint annotation_session_export (
+static guint annotation_session_export (
 	NautilusAnnotationsSession * session
 ) {
 
@@ -252,11 +251,7 @@ guint annotation_session_export (
 	GFile * location;
 	GError * saverr = NULL;
 
-	for (
-		GList * iter = session->targets;
-			iter;
-		iter = iter->next
-	) {
+	for (GList * iter = session->targets; iter; iter = iter->next) {
 
 		location = nautilus_file_info_get_location(
 			NAUTILUS_FILE_INFO(iter->data)
@@ -301,7 +296,7 @@ guint annotation_session_export (
 }
 
 
-void annotation_session_save (
+static void annotation_session_save (
 	NautilusAnnotationsSession * session
 ) {
 
@@ -317,7 +312,7 @@ void annotation_session_save (
 }
 
 
-void annotation_session_exit (
+static void annotation_session_exit (
 	NautilusAnnotationsSession * session
 ) {
 
@@ -336,7 +331,7 @@ void annotation_session_exit (
 }
 
 
-void annotation_session_discard (
+static void annotation_session_discard (
 	NautilusAnnotationsSession * session
 ) {
 
@@ -366,8 +361,14 @@ static void on_annotation_dialog_response (
 
 	switch (response_id) {
 
-		case GTK_RESPONSE_REJECT: annotation_session_discard(session); return;
-		default: annotation_session_exit(session);
+		case GTK_RESPONSE_REJECT:
+
+			annotation_session_discard(session);
+			return;
+
+		default:
+
+			annotation_session_exit(session);
 
 	}
 
@@ -375,49 +376,14 @@ static void on_annotation_dialog_response (
 
 
 static void on_text_modified_state_change (
-	GtkSourceBuffer * const text_buffer,
+	GtkSourceBuffer * const annotation_text,
 	NautilusAnnotationsSession * const session
 ) {
 
-	switch (
-		(gtk_text_buffer_get_modified(
-			GTK_TEXT_BUFFER(text_buffer)
-		) << 1) | !session->discard_button
-	) {
-
-		case 0:
-
-			gtk_widget_destroy(GTK_WIDGET(session->discard_button));
-			session->discard_button = NULL;
-			break;
-
-		case 3:
-
-			session->discard_button = GTK_BUTTON(
-				gtk_dialog_add_button(
-					session->annotation_dialog,
-					_("_Discard changes"),
-					GTK_RESPONSE_REJECT
-				)
-			);
-
-			gtk_style_context_add_class(
-				gtk_widget_get_style_context(
-					GTK_WIDGET(session->discard_button)
-				),
-				"nautilus-annotations-discard"
-			);
-
-		/*
-
-		`case 1` ==> The `"modified"` bit flipped to `false` but for obscure
-			reasons the discard button was already gone (do nothing)
-		`case 2` ==> The `"modified"` bit flipped to `true` but for obscure
-			reasons the discard button was already there (do nothing)
-
-		*/
-
-	}
+	gtk_widget_set_visible(
+		GTK_WIDGET(session->discard_button),
+		gtk_text_buffer_get_modified(GTK_TEXT_BUFFER(annotation_text))
+	);
 
 }
 
@@ -443,9 +409,20 @@ static void annotation_session_new_with_text (
 				"markdown"
 			)
 		),
-		.discard_button = NULL,
-		.targets = nautilus_file_info_list_copy(target_files),
+		.discard_button = GTK_BUTTON(
+			gtk_dialog_add_button(
+				anndialog,
+				_("_Discard changes"),
+				GTK_RESPONSE_REJECT
+			)
+		),
+		.targets = nautilus_file_info_list_copy(target_files)
 	};
+
+	gtk_window_set_modal(GTK_WINDOW(anndialog), true);
+	gtk_window_set_transient_for(GTK_WINDOW(anndialog), parent);
+	gtk_widget_hide(GTK_WIDGET(session->discard_button));
+	gtk_widget_set_no_show_all(GTK_WIDGET(session->discard_button), true);
 
 	if (initial_text) {
 
@@ -471,12 +448,13 @@ static void annotation_session_new_with_text (
 		"nautilus-annotations-dialog"
 	);
 
-	const gchar
-		* header_title;
+	gtk_style_context_add_class(
+		gtk_widget_get_style_context(GTK_WIDGET(session->discard_button)),
+		"nautilus-annotations-discard"
+	);
 
-	gchar
-		* header_subtitle,
-		* tmpbuf = NULL;
+	gchar * header_subtitle, * tmpbuf = NULL;
+	const gchar * header_title;
 
 	if (session->targets->next) {
 
@@ -494,9 +472,11 @@ static void annotation_session_new_with_text (
 		header_title = _("Annotations");
 		header_subtitle = _("Unknown path");
 
-		if ((header_subtitle = tmpbuf)) {
+		if (tmpbuf) {
 
 			const gchar * const homedir = g_get_home_dir();
+
+			header_subtitle = tmpbuf;
 
 			if (homedir && *homedir && g_str_has_prefix(tmpbuf, homedir)) {
 
@@ -522,25 +502,11 @@ static void annotation_session_new_with_text (
 	gtk_window_set_title(GTK_WINDOW(anndialog), header_title);
 
 	gtk_header_bar_set_subtitle(
-		GTK_HEADER_BAR(gtk_window_get_titlebar(GTK_WINDOW(anndialog))),
+		GTK_HEADER_BAR(gtk_dialog_get_header_bar(anndialog)),
 		header_subtitle
 	);
 
 	g_free(tmpbuf);
-
-	GtkWidget
-		* const scrollable = gtk_scrolled_window_new(NULL, NULL),
-		* const text_area = gtk_source_view_new_with_buffer(
-			session->annotation_text
-		);
-
-	gtk_style_context_add_class(
-		gtk_widget_get_style_context(text_area),
-		"nautilus-annotations-view"
-	);
-
-	gtk_window_set_modal(GTK_WINDOW(anndialog), true);
-	gtk_window_set_transient_for(GTK_WINDOW(anndialog), parent);
 
 	GdkRectangle workarea = { 0 };
 
@@ -556,6 +522,17 @@ static void annotation_session_new_with_text (
 		GTK_WINDOW(anndialog),
 		workarea.width ? workarea.width * 2 / 3 : 300,
 		workarea.height ? workarea.height * 2 / 3 : 400
+	);
+
+	GtkWidget
+		* const scrollable = gtk_scrolled_window_new(NULL, NULL),
+		* const text_area = gtk_source_view_new_with_buffer(
+			session->annotation_text
+		);
+
+	gtk_style_context_add_class(
+		gtk_widget_get_style_context(text_area),
+		"nautilus-annotations-view"
 	);
 
 	gtk_widget_set_vexpand(text_area, true);
@@ -783,10 +760,13 @@ static GList * nautilus_annotations_get_file_items (
 	#define NA_HAVE_ANNOTATED 1
 	#define NA_HAVE_UNANNOTATED 2
 
-	guint8
-		selection_type = 0,
-		selection_content = 0;
+	if (!file_selection) {
 
+		return NULL;
+
+	}
+
+	guint8 selection_type = 0, selection_content = 0;
 	gsize sellen = 0;
 	GList * iter;
 	GFile * location;
@@ -848,9 +828,7 @@ static GList * nautilus_annotations_get_file_items (
 
 	}
 
-	NautilusMenuItem
-		* item_annotations,
-		* item_annotate;
+	NautilusMenuItem * item_annotations, * item_annotate;
 
 	if (selection_content & NA_HAVE_ANNOTATED) {
 
@@ -993,7 +971,7 @@ static GList * nautilus_annotations_get_file_items (
 }
 
 
-GList * nautilus_annotations_get_background_items (
+static GList * nautilus_annotations_get_background_items (
 	NautilusMenuProvider * const menu_provider,
 	GtkWidget * const nautilus_window,
 	NautilusFileInfo * const current_folder
@@ -1014,7 +992,7 @@ GList * nautilus_annotations_get_background_items (
 }
 
 
-NautilusOperationResult nautilus_annotations_update_file_info (
+static NautilusOperationResult nautilus_annotations_update_file_info (
 	NautilusInfoProvider * const info_provider,
 	NautilusFileInfo * const file,
 	GClosure * const update_complete,

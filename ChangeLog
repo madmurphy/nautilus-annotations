@@ -2,6 +2,19 @@ Change Log
 ==========
 
 
+## 0.6.1 (2021-05-12)
+
+Changes:
+
+* Showing and hiding the discard button is now handled gracefully -- the
+  button's CSS class persists between state changes, and this prevents delays
+  in the decoration of the widget
+* Code review
+* Documentation
+* A small bug in the build system that caused `make distcheck` not to function
+  properly has been fixed
+
+
 ## 0.6.0 (2021-05-10)
 
 Changes:
