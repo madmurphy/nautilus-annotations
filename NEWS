@@ -2,6 +2,11 @@ NEWS
 ====
 
 
+## 0.7.0
+
+* An "Annotations" column has been added to Nautilus' list view
+
+
 ## 0.6.0
 
 * Two new keyboard shortcuts have been created (`Ctrl` + `S` and `Shift` +

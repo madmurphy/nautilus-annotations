@@ -31,6 +31,7 @@
 #endif
 
 #include <stdbool.h>
+#include <ctype.h>
 #include <stdio.h>
 #include <string.h>
 #include <glib.h>
@@ -95,6 +96,10 @@ static GtkCssProvider * annotations_css;
 
 /*  The CSS to add to the screen  */
 #define NAUTILUS_ANNOTATIONS_CSS PACKAGE_DATA_DIR "/style.css"
+
+/*  Both these constants are measured in number of unicode characters  */
+#define A8N_COLUMN_WRAP 40
+#define A8N_COLUMN_MAX_LENGTH 119
 
 
 
@@ -394,15 +399,15 @@ static void annotation_session_new_with_text (
 	/*  nullable  */  gchar * initial_text
 ) {
 
-	NautilusAnnotationsSession * const
-		session = g_malloc(sizeof(NautilusAnnotationsSession));
+	NautilusAnnotationsSession
+		* const session = g_new(NautilusAnnotationsSession, 1);
 
-	GtkDialog * anndialog = GTK_DIALOG(
+	GtkDialog * const a8n_dialog = GTK_DIALOG(
 		g_object_new(GTK_TYPE_DIALOG, "use-header-bar", true, NULL)
 	);
 
 	*session = (NautilusAnnotationsSession) {
-		.annotation_dialog = anndialog,
+		.annotation_dialog = a8n_dialog,
 		.annotation_text = gtk_source_buffer_new_with_language(
 			gtk_source_language_manager_get_language(
 				gtk_source_language_manager_get_default(),
@@ -411,7 +416,7 @@ static void annotation_session_new_with_text (
 		),
 		.discard_button = GTK_BUTTON(
 			gtk_dialog_add_button(
-				anndialog,
+				a8n_dialog,
 				_("_Discard changes"),
 				GTK_RESPONSE_REJECT
 			)
@@ -419,8 +424,8 @@ static void annotation_session_new_with_text (
 		.targets = nautilus_file_info_list_copy(target_files)
 	};
 
-	gtk_window_set_modal(GTK_WINDOW(anndialog), true);
-	gtk_window_set_transient_for(GTK_WINDOW(anndialog), parent);
+	gtk_window_set_modal(GTK_WINDOW(a8n_dialog), true);
+	gtk_window_set_transient_for(GTK_WINDOW(a8n_dialog), parent);
 	gtk_widget_hide(GTK_WIDGET(session->discard_button));
 	gtk_widget_set_no_show_all(GTK_WIDGET(session->discard_button), true);
 
@@ -444,7 +449,7 @@ static void annotation_session_new_with_text (
 	}
 
 	gtk_style_context_add_class(
-		gtk_widget_get_style_context(GTK_WIDGET(anndialog)),
+		gtk_widget_get_style_context(GTK_WIDGET(a8n_dialog)),
 		"nautilus-annotations-dialog"
 	);
 
@@ -499,10 +504,10 @@ static void annotation_session_new_with_text (
 
 	}
 
-	gtk_window_set_title(GTK_WINDOW(anndialog), header_title);
+	gtk_window_set_title(GTK_WINDOW(a8n_dialog), header_title);
 
 	gtk_header_bar_set_subtitle(
-		GTK_HEADER_BAR(gtk_dialog_get_header_bar(anndialog)),
+		GTK_HEADER_BAR(gtk_dialog_get_header_bar(a8n_dialog)),
 		header_subtitle
 	);
 
@@ -519,7 +524,7 @@ static void annotation_session_new_with_text (
 	);
 
 	gtk_window_set_default_size(
-		GTK_WINDOW(anndialog),
+		GTK_WINDOW(a8n_dialog),
 		workarea.width ? workarea.width * 2 / 3 : 300,
 		workarea.height ? workarea.height * 2 / 3 : 400
 	);
@@ -541,12 +546,12 @@ static void annotation_session_new_with_text (
 	gtk_container_add(GTK_CONTAINER(scrollable), text_area);
 
 	gtk_container_add(
-		GTK_CONTAINER(gtk_dialog_get_content_area(anndialog)),
+		GTK_CONTAINER(gtk_dialog_get_content_area(a8n_dialog)),
 		scrollable
 	);
 
 	g_signal_connect(
-		anndialog,
+		a8n_dialog,
 		"response",
 		G_CALLBACK(on_annotation_dialog_response),
 		session
@@ -585,8 +590,8 @@ static void annotation_session_new_with_text (
 		)
 	);
 
-	gtk_window_add_accel_group(GTK_WINDOW(anndialog), shortcuts);
-	gtk_widget_show_all(GTK_WIDGET(anndialog));
+	gtk_window_add_accel_group(GTK_WINDOW(a8n_dialog), shortcuts);
+	gtk_widget_show_all(GTK_WIDGET(a8n_dialog));
 
 }
 
@@ -836,7 +841,7 @@ static GList * nautilus_annotations_get_file_items (
 		NautilusMenuItem * subitem_iter;
 
 		item_annotations = nautilus_menu_item_new(
-			"NautilusAnnotations::annotations",
+			"NautilusAnnotations::choose",
 			selection_type == NA_IS_DIRECTORY_SELECTION ?
 				g_dngettext(
 					GETTEXT_PACKAGE,
@@ -871,10 +876,8 @@ static GList * nautilus_annotations_get_file_items (
 			:
 				_("_Edit"),
 			selection_content & NA_HAVE_UNANNOTATED ?
-				_(
-					"Edit and extend the annotations attached to the selected"
-						" objects"
-				)
+				_("Edit and extend the annotations attached to the selected"
+					" objects")
 			:
 				g_dngettext(
 					GETTEXT_PACKAGE,
@@ -992,14 +995,86 @@ static GList * nautilus_annotations_get_background_items (
 }
 
 
+static inline void wrap_text_utf8 (
+	gchar * const str,
+	const gsize max
+) {
+
+	gsize uprevlen, ucurrlen = 0, ulinelen = 0;
+	gchar * currptr, * nextptr = str;
+
+
+	/* \                                /\
+	\ */     keep_going:               /* \
+	 \/     ______________________     \ */
+
+
+	ulinelen++;
+
+
+	/* \                                /\
+	\ */     new_line:                 /* \
+	 \/     ______________________     \ */
+
+
+	currptr = nextptr;
+	nextptr = g_utf8_next_char(currptr);
+	ucurrlen++;
+
+	switch (*currptr) {
+
+		case '\0':
+
+			return;
+
+		case '\n':
+
+			ulinelen = 1;
+			goto new_line;
+
+		case ' ':
+		case '\t':
+		case '\f':
+		case '\v':
+		case '\r':
+
+			uprevlen = ucurrlen;
+
+			while (*nextptr && !isspace(*nextptr)) {
+
+				ucurrlen++;
+				nextptr = g_utf8_next_char(nextptr);
+
+			}
+
+			if (ucurrlen + ulinelen > uprevlen + max) {
+
+				*currptr = '\n';
+				ulinelen = ucurrlen - uprevlen + 1;
+				goto new_line;
+
+			}
+
+			ulinelen += ucurrlen - uprevlen;
+			/*  No case break (fallthrough)  */
+
+		default:
+
+			goto keep_going;
+
+	}
+
+}
+
+
 static NautilusOperationResult nautilus_annotations_update_file_info (
 	NautilusInfoProvider * const info_provider,
-	NautilusFileInfo * const file,
+	NautilusFileInfo * const nautilus_file,
 	GClosure * const update_complete,
 	NautilusOperationHandle ** const handle
 ) {
 
-	GFile * location = nautilus_file_info_get_location(file);
+	GFile * location = nautilus_file_info_get_location(nautilus_file);
 
 	GFileInfo * const finfo = g_file_query_info(
 		location,
@@ -1017,19 +1092,73 @@ static NautilusOperationResult nautilus_annotations_update_file_info (
 
 	}
 
-	if (
-		g_file_info_get_attribute_string(
-			finfo,
-			G_FILE_ATTRIBUTE_METADATA_ANNOTATION
-		)
-	) {
+	const char * annotation_probe = g_file_info_get_attribute_string(
+		finfo,
+		G_FILE_ATTRIBUTE_METADATA_ANNOTATION
+	);
 
-		nautilus_file_info_add_emblem(file, "emblem-annotations");
+	if (annotation_probe) {
+
+		nautilus_file_info_add_emblem(nautilus_file, "emblem-annotations");
+
+		gchar * wrapped_annotations;
+		gsize a8n_size = strlen(annotation_probe);
+
+		if (g_utf8_strlen(annotation_probe, a8n_size) > A8N_COLUMN_MAX_LENGTH) {
+
+			a8n_size = g_utf8_offset_to_pointer(
+				annotation_probe,
+				A8N_COLUMN_MAX_LENGTH
+			) - annotation_probe;
+
+			wrapped_annotations = g_malloc(a8n_size + 4);
+			memcpy(wrapped_annotations, annotation_probe, a8n_size);
+			memcpy(wrapped_annotations + a8n_size, "\342\200\246", 4);
+
+		} else {
+
+			wrapped_annotations = g_memdup2(annotation_probe, a8n_size + 1);
+
+		}
+
+		wrap_text_utf8(wrapped_annotations, A8N_COLUMN_WRAP);
+
+		nautilus_file_info_add_string_attribute(
+			nautilus_file,
+			"annotations",
+			wrapped_annotations
+		);
+
+		g_free(wrapped_annotations);
+
+	} else {
+
+		nautilus_file_info_add_string_attribute(
+			nautilus_file,
+			"annotations",
+			""
+		);
 
 	}
 
 	g_object_unref(finfo);
 	return NAUTILUS_OPERATION_COMPLETE;
+
+}
+
+
+static GList * nautilus_annotations_get_columns (
+	NautilusColumnProvider * const column_provider
+) {
+
+	NautilusColumn * column = nautilus_column_new(
+		"annotations",
+		"annotations",
+		_("Annotations"),
+		_("Annotations attached to the object")
+	);
+
+	return g_list_append(NULL, column);
 
 }
 
@@ -1051,6 +1180,16 @@ static void nautilus_annotations_menu_provider_iface_init (
 
 	iface->get_file_items = nautilus_annotations_get_file_items;
 	iface->get_background_items = nautilus_annotations_get_background_items;
+
+}
+
+
+static void nautilus_annotations_column_provider_iface_init (
+	NautilusColumnProviderIface * const iface,
+	gpointer const iface_data
+) {
+
+	iface->get_columns = nautilus_annotations_get_columns;
 
 }
 
@@ -1103,6 +1242,12 @@ static void nautilus_annotations_register_type (
 		NULL
 	};
 
+	static const GInterfaceInfo column_provider_iface_info = {
+		(GInterfaceInitFunc) nautilus_annotations_column_provider_iface_init,
+		(GInterfaceFinalizeFunc) NULL,
+		NULL
+	};
+
 	g_type_module_add_interface(
 		module,
 		nautilus_annotations_type,
@@ -1115,6 +1260,13 @@ static void nautilus_annotations_register_type (
 		nautilus_annotations_type,
 		NAUTILUS_TYPE_MENU_PROVIDER,
 		&menu_provider_iface_info
+	);
+
+	g_type_module_add_interface(
+		module,
+		nautilus_annotations_type,
+		NAUTILUS_TYPE_COLUMN_PROVIDER,
+		&column_provider_iface_info
 	);
 
 }

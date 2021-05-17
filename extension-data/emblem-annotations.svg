@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
 	<defs><style>.cls-1{fill:#474747}.cls-2{fill:#fff}</style></defs>
-	<title>Annotation Emblem</title>
+	<title>Annotations Emblem</title>
 	<circle class="cls-1" cx="12" cy="12" r="10.5"/>
 	<polygon class="cls-2" points="19.55 14.25 14.71 19.1 14.28 19.53 11.81 17.06 12.24 16.63 17.09 11.79 19.55 14.25"/>
 	<path class="cls-2" d="M20.83,13l-.58.58L17.78,11.1l.59-.59a.32.32,0,0,1,.46,0l2,2A.34.34,0,0,1,20.83,13Z"/>
