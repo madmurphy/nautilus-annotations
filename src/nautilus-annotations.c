@@ -618,7 +618,7 @@ static void on_annotate_menuitem_activate (
 
 	}
 
-	const char * annotation_probe;
+	const char * a8n_probe;
 	gchar * current_annotation = NULL;
 	GFile * location;
 	GFileInfo * finfo;
@@ -654,12 +654,12 @@ static void on_annotate_menuitem_activate (
 
 		}
 
-		annotation_probe = g_file_info_get_attribute_string(
+		a8n_probe = g_file_info_get_attribute_string(
 			finfo,
 			G_FILE_ATTRIBUTE_METADATA_ANNOTATION
 		);
 
-		if (!annotation_probe) {
+		if (!a8n_probe) {
 
 			goto unref_and_continue;
 
@@ -667,12 +667,12 @@ static void on_annotate_menuitem_activate (
 
 		if (!current_annotation) {
 
-			current_annotation = g_strdup(annotation_probe);
+			current_annotation = g_strdup(a8n_probe);
 			goto unref_and_continue;
 
 		}
 
-		if (strcmp(annotation_probe, current_annotation)) {
+		if (strcmp(a8n_probe, current_annotation)) {
 
 			g_object_unref(finfo);
 			g_clear_pointer(&current_annotation, g_free);
@@ -761,6 +761,7 @@ static GList * nautilus_annotations_get_file_items (
 
 	#define NA_IS_FILE_SELECTION 1
 	#define NA_IS_DIRECTORY_SELECTION 2
+	#define NA_IS_MIXED_SELECTION 3
 
 	#define NA_HAVE_ANNOTATED 1
 	#define NA_HAVE_UNANNOTATED 2
@@ -771,7 +772,7 @@ static GList * nautilus_annotations_get_file_items (
 
 	}
 
-	guint8 selection_type = 0, selection_content = 0;
+	guint8 selection_type = 0, selection_flags = 0;
 	gsize sellen = 0;
 	GList * iter;
 	GFile * location;
@@ -805,7 +806,7 @@ static GList * nautilus_annotations_get_file_items (
 
 		}
 
-		selection_content |= g_file_info_get_attribute_string(
+		selection_flags |= g_file_info_get_attribute_string(
 			finfo,
 			G_FILE_ATTRIBUTE_METADATA_ANNOTATION
 		) ? NA_HAVE_ANNOTATED : NA_HAVE_UNANNOTATED;
@@ -813,7 +814,7 @@ static GList * nautilus_annotations_get_file_items (
 		g_object_unref(finfo);
 
 		if (
-			!(~selection_content & (NA_HAVE_ANNOTATED | NA_HAVE_UNANNOTATED))
+			!(~selection_flags & (NA_HAVE_ANNOTATED | NA_HAVE_UNANNOTATED))
 		) {
 
 			break;
@@ -835,7 +836,7 @@ static GList * nautilus_annotations_get_file_items (
 
 	NautilusMenuItem * item_annotations, * item_annotate;
 
-	if (selection_content & NA_HAVE_ANNOTATED) {
+	if (selection_flags & NA_HAVE_ANNOTATED) {
 
 		NautilusMenu * const menu_annotations = nautilus_menu_new();
 		NautilusMenuItem * subitem_iter;
@@ -871,11 +872,11 @@ static GList * nautilus_annotations_get_file_items (
 
 		item_annotate = nautilus_menu_item_new(
 			"NautilusAnnotations::annotate",
-			selection_content & NA_HAVE_UNANNOTATED ?
+			selection_flags & NA_HAVE_UNANNOTATED ?
 				_("_Edit and extend")
 			:
 				_("_Edit"),
-			selection_content & NA_HAVE_UNANNOTATED ?
+			selection_flags & NA_HAVE_UNANNOTATED ?
 				_("Edit and extend the annotations attached to the selected"
 					" objects")
 			:
@@ -968,6 +969,7 @@ static GList * nautilus_annotations_get_file_items (
 	#undef NA_HAVE_UNANNOTATED
 	#undef NA_HAVE_ANNOTATED
 
+	#undef NA_IS_MIXED_SELECTION
 	#undef NA_IS_DIRECTORY_SELECTION
 	#undef NA_IS_FILE_SELECTION
 
@@ -1092,32 +1094,32 @@ static NautilusOperationResult nautilus_annotations_update_file_info (
 
 	}
 
-	const char * annotation_probe = g_file_info_get_attribute_string(
+	const char * a8n_probe = g_file_info_get_attribute_string(
 		finfo,
 		G_FILE_ATTRIBUTE_METADATA_ANNOTATION
 	);
 
-	if (annotation_probe) {
+	if (a8n_probe) {
 
 		nautilus_file_info_add_emblem(nautilus_file, "emblem-annotations");
 
 		gchar * wrapped_annotations;
-		gsize a8n_size = strlen(annotation_probe);
+		gsize a8n_size = strlen(a8n_probe);
 
-		if (g_utf8_strlen(annotation_probe, a8n_size) > A8N_COLUMN_MAX_LENGTH) {
+		if (g_utf8_strlen(a8n_probe, a8n_size) > A8N_COLUMN_MAX_LENGTH) {
 
 			a8n_size = g_utf8_offset_to_pointer(
-				annotation_probe,
+				a8n_probe,
 				A8N_COLUMN_MAX_LENGTH
-			) - annotation_probe;
+			) - a8n_probe;
 
 			wrapped_annotations = g_malloc(a8n_size + 4);
-			memcpy(wrapped_annotations, annotation_probe, a8n_size);
+			memcpy(wrapped_annotations, a8n_probe, a8n_size);
 			memcpy(wrapped_annotations + a8n_size, "\342\200\246", 4);
 
 		} else {
 
-			wrapped_annotations = g_memdup2(annotation_probe, a8n_size + 1);
+			wrapped_annotations = g_memdup2(a8n_probe, a8n_size + 1);
 
 		}
 

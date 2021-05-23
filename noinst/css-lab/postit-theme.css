@@ -1,0 +1,35 @@
+dialog.nautilus-annotations-dialog,
+dialog.nautilus-annotations-dialog .titlebar {
+	border: none;
+	background: #fff394;
+	color: #ad5f00;
+}
+
+dialog.nautilus-annotations-dialog selection {
+	background: #ad5f00;
+	color: #fff394;
+}
+
+dialog.nautilus-annotations-dialog text,
+dialog.nautilus-annotations-dialog button {
+	background: transparent;
+	color: #ad5f00;
+}
+
+dialog.nautilus-annotations-dialog button.close {
+	color: #cc0000;
+	border: none;
+	box-shadow: none;
+}
+
+dialog.nautilus-annotations-dialog button.nautilus-annotations-discard {
+	padding: 1px 7px;
+	background: #ad5f00;
+	color: #fff394;
+	border: none;
+	box-shadow: 0 0 2px 2px #ad5f00;
+}
+
+textview.nautilus-annotations-view {
+	font-family: monospace;
+}

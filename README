@@ -17,9 +17,9 @@ exploits the same machinery that was used back then: that of relying on **GIO**
 to store custom information about a file or a directory.
 
 Each annotation is stored as a `metadata::annotation` entry in **GIO**'s
-database. Annotated files are shown in the viewport with an emblem attached;
-an “Annotations” column is made available to Nautilus' list view for displaying
-short previews of what has been annotated.
+database. An “Annotations” column containing a short preview of what has been
+annotated is made available to Nautilus. Annotated files are shown in the
+viewport with an emblem attached.
 
 To erase an annotation it is sufficient to leave the content blank, and the
 extension will take care of erasing the database entry.
@@ -38,7 +38,7 @@ is uninstalled (the `metadata::emblems` database entry for the file is left
 untouched). The content of the annotations instead is managed by **GIO** and
 will survive uninstalling the extension.
 
-Annotations are stored under `~/.local/share/gvfs-metadata`. It is possible to
+Annotations are stored in `~/.local/share/gvfs-metadata`. It is possible to
 access them via command line by launching:
 
 ``` sh

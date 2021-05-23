@@ -3,6 +3,9 @@
 Please bear in mind that this CSS affects the entire screen, not just the
 annotations window, so be careful with wildcard selectors.
 
+This CSS overrides themes' styles. If you want to create a custom CSS for this
+extension consider to add it to a theme instead of editing this file.
+
 For information about Nautilus Annotations' DOM tree and all available
 selectors please refer to `/usr/share/doc/nautilus-annotations/styling.md`.
 

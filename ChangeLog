@@ -2,6 +2,15 @@ Change Log
 ==========
 
 
+## 0.7.1 (2021-05-23)
+
+Changes:
+
+* Non-scalable icon formats have been added to the package for faster rendering
+* Colored versions of the action icons and an emblem for Adwaita have been
+  created
+
+
 ## 0.7.0 (2021-05-17)
 
 Changes:

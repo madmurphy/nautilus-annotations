@@ -6,10 +6,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: 0.7.0\n"
+"Project-Id-Version: 0.7.1\n"
 "Report-Msgid-Bugs-To: <madmurphy333@gmail.com>\n"
-"POT-Creation-Date: 2021-05-17 15:55+0200\n"
-"PO-Revision-Date: 2021-05-17 15:23+0200\n"
+"POT-Creation-Date: 2021-05-22 14:39+0200\n"
+"PO-Revision-Date: 2021-05-22 14:39+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Italian <tp@lists.linux.it>\n"
 "Language: it\n"
@@ -46,7 +46,7 @@ msgstr "Annotazioni condivise"
 msgid "(multiple objects)"
 msgstr "(più oggetti)"
 
-#: ../src/nautilus-annotations.c:477 ../src/nautilus-annotations.c:1157
+#: ../src/nautilus-annotations.c:477 ../src/nautilus-annotations.c:1159
 msgid "Annotations"
 msgstr "Annotazioni"
 
@@ -82,78 +82,78 @@ msgstr "Si vogliono davvero rimuovere le annotazioni allegate?"
 msgid "The annotations will be lost forever."
 msgstr "Le annotazioni andranno perse per sempre."
 
-#: ../src/nautilus-annotations.c:745 ../src/nautilus-annotations.c:895
+#: ../src/nautilus-annotations.c:745 ../src/nautilus-annotations.c:896
 msgid "E_rase"
 msgstr "_Rimuovi"
 
-#: ../src/nautilus-annotations.c:848
+#: ../src/nautilus-annotations.c:849
 msgid "Directory's _annotations"
 msgid_plural "Directories' _annotations"
 msgstr[0] "_Annotazioni della cartella"
 msgstr[1] "_Annotazioni delle cartelle"
 
-#: ../src/nautilus-annotations.c:855
+#: ../src/nautilus-annotations.c:856
 msgid "File's _annotations"
 msgid_plural "Files' _annotations"
 msgstr[0] "_Annotazioni del file"
 msgstr[1] "_Annotazioni dei file"
 
-#: ../src/nautilus-annotations.c:860
+#: ../src/nautilus-annotations.c:861
 msgid "Objects' _annotations"
 msgstr "_Annotazioni degli oggetti"
 
-#: ../src/nautilus-annotations.c:863
+#: ../src/nautilus-annotations.c:864
 msgid "Choose an action for the object's annotations"
 msgid_plural "Choose an action for the objects' annotations"
 msgstr[0] "Scegli un'azione da compiere con le annotazioni dell'oggetto"
 msgstr[1] "Scegli un'azione da compiere con le annotazioni degli oggetti"
 
-#: ../src/nautilus-annotations.c:875
+#: ../src/nautilus-annotations.c:876
 msgid "_Edit and extend"
 msgstr "_Modifica ed estendi"
 
-#: ../src/nautilus-annotations.c:877
+#: ../src/nautilus-annotations.c:878
 msgid "_Edit"
 msgstr "_Modifica"
 
-#: ../src/nautilus-annotations.c:879
+#: ../src/nautilus-annotations.c:880
 msgid "Edit and extend the annotations attached to the selected objects"
 msgstr "Modifica ed estendi le annotazioni allegate agli oggetti selezionati"
 
-#: ../src/nautilus-annotations.c:884
+#: ../src/nautilus-annotations.c:885
 msgid "Edit the annotations attached to the selected object"
 msgid_plural "Edit the annotations attached to the selected objects"
 msgstr[0] "Modifica le annotazioni allegate all'oggetto selezionato"
 msgstr[1] "Modifica le annotazioni allegate agli oggetti selezionati"
 
-#: ../src/nautilus-annotations.c:898
+#: ../src/nautilus-annotations.c:899
 msgid "Remove the annotations attached to the selected object"
 msgid_plural "Remove the annotations attached to the selected objects"
 msgstr[0] "Rimuovi le annotazioni allegate all'oggetto selezionato"
 msgstr[1] "Rimuovi le annotazioni allegate agli oggetti selezionati"
 
-#: ../src/nautilus-annotations.c:928
+#: ../src/nautilus-annotations.c:929
 msgid "_Annotate directory"
 msgid_plural "_Annotate directories"
 msgstr[0] "_Annota la cartella"
 msgstr[1] "_Annota le cartelle"
 
-#: ../src/nautilus-annotations.c:935
+#: ../src/nautilus-annotations.c:936
 msgid "_Annotate file"
 msgid_plural "_Annotate files"
 msgstr[0] "_Annota il file"
 msgstr[1] "_Annota i file"
 
-#: ../src/nautilus-annotations.c:940
+#: ../src/nautilus-annotations.c:941
 msgid "_Annotate objects"
 msgstr "_Annota gli oggetti"
 
-#: ../src/nautilus-annotations.c:943
+#: ../src/nautilus-annotations.c:944
 msgid "Attach an annotation to the selected object"
 msgid_plural "Attach an annotation to the selected objects"
 msgstr[0] "Allega un'annotazione all'oggetto selezionato"
 msgstr[1] "Allega un'annotazione agli oggetti selezionati"
 
-#: ../src/nautilus-annotations.c:1158
+#: ../src/nautilus-annotations.c:1160
 msgid "Annotations attached to the object"
 msgstr "Annotazioni allegate all'oggetto"
