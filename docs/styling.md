@@ -88,8 +88,14 @@ textview.nautilus-annotations-view {
 }
 ```
 
-For more information, please refer to the [GTK CSS documentation][1].
+Under `css-factory` a collection of CSS themes is available. If you have new
+stylesheets and ideas, please do not hesitate to propose them via
+[merge request][1] or [message][2].
+
+For more information, please refer to the [GTK CSS documentation][3].
 
 
-  [1]: https://developer.gnome.org/gtk3/stable/chap-css-overview.html
+  [1]: https://gitlab.gnome.org/madmurphy/nautilus-annotations
+  [2]: https://gitlab.gnome.org/madmurphy/nautilus-annotations/issues
+  [3]: https://developer.gnome.org/gtk3/stable/chap-css-overview.html
 

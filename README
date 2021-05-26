@@ -64,16 +64,17 @@ Get involved
 The package needs help with internationalization. If a translation into your
 language is missing and you wish to get involved, here is what to do.
 
-Let's say you want to create a Dutch translation of **Nautilus Annotations**.
-The extension comes with only a bunch of strings to translate. First thing to
-do is to make sure that `gettext` and `intltool` are installed on your system.
-Then clone this repository and launch the following four commands:
+Let's say you want to create a Dutch translation of **Nautilus Annotations**
+(`nl`). The extension comes with only a bunch of strings to translate. First
+thing to do is to make sure that **GNU Autotools** and **GNU gettext** are
+installed on your system. Then clone this repository and launch the following
+commands:
 
 ``` sh
-cd nautilus-annotations/po
-intltool-update -p --gettext-package=nautilus-annotations
-msginit -l nl
-rm nautilus-annotations.pot
+./bootstrap
+make -C po nautilus-annotations.pot
+(cd po && msginit -l nl)
+./bootstrap --clean
 ```
 
 Now edit the `po/LINGUAS` file and add a new line containing the abbreviated
@@ -82,17 +83,7 @@ name of the new language (`nl`).
 Finally, open the `po/nl.po` file and translate the strings present. All you
 have to do now is to commit your changes.
 
-If you want to update an existing Dutch translation to the most recent changes
-in the extension source code, launch
-
-``` sh
-cd nautilus-annotations/po
-intltool-update -p --gettext-package=nautilus-annotations
-mv nl.po nl.po.bak && msgmerge nl.po.bak nautilus-annotations.pot > nl.po
-rm nautilus-annotations.pot nl.po.bak
-```
-
-For any issue, [drop me a message][1].
+For any issue, [drop a message][1].
 
 
 Installation

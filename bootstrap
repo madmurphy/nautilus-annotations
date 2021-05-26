@@ -1,3 +1,4 @@
+
 #!/bin/bash
 # Run this to generate all the initial makefiles, etc.
 
@@ -41,7 +42,13 @@ if test "${CLEANONLY}" -ne 0; then
 	echo 'Cleaning package...'
 	test -f 'Makefile' && make maintainer-clean
 	rm -Rf autom4te.cache m4 build-aux no-dist `find . -type d -name .deps`
-	rm -f aclocal.m4 compile config.* configure configure~ depcomp install-sh libtool ltmain.sh missing intltool-* `find . -name Makefile.in`
+	rm -f *'~' 'ABOUT-NLS' 'aclocal.m4' 'compile' 'config'.* 'configure' \
+		'depcomp' 'install-sh' 'intltool-*' 'libtool' 'ltmain.sh' \
+		'missing' `find . -name Makefile.in` 'po/boldquot.sed' \
+		'po/en@boldquot.header' 'po/en@quot.header' \
+		'po/insert-header.sin' 'po/'*'~' 'po/Makefile.in.in' \
+		'po/Makevars.template' 'po/quot.sed' 'po/remove-potcdate.sin' \
+		'po/Rules-quot'
 	echo 'Done'
 	exit 0
 fi
@@ -64,7 +71,8 @@ test -f "${srcdir}/configure.ac" || {
 autoconf --version < /dev/null > /dev/null 2>&1 || {
 	echo
 	echo '**Error**: You must have `autoconf` installed. Download the appropriate package'
-	echo 'for your distribution, or get the source tarball at ftp://ftp.gnu.org/pub/gnu/'
+	echo 'for your distribution, or get the source tarball at'
+	echo 'https://www.gnu.org/software/autoconf/'
 	echo
 	DIE=1
 } >&2
@@ -73,7 +81,7 @@ if grep "^IT_PROG_INTLTOOL" "${srcdir}/configure.ac" >/dev/null; then
 	intltoolize --version < /dev/null > /dev/null 2>&1 || {
 		echo
 		echo '**Error**: You must have `intltool` installed. You can get it from'
-		echo 'ftp://ftp.gnome.org/pub/GNOME/'
+		echo 'https://freedesktop.org/wiki/Software/intltool/'
 		echo
 		DIE=1
 	} >&2
@@ -82,8 +90,8 @@ fi
 if grep "^AM_PROG_XML_I18N_TOOLS" "${srcdir}/configure.ac" >/dev/null; then
 	xml-i18n-toolize --version < /dev/null > /dev/null 2>&1 || {
 		echo
-		echo '**Error**: You must have `xml-i18n-toolize` installed. You can get it from'
-		echo 'ftp://ftp.gnome.org/pub/GNOME/'
+		echo '**Error**: You must have `xml-i18n-tools` installed. You can get it from'
+		echo 'https://download.gnome.org/sources/xml-i18n-tools/'
 		echo
 		DIE=1
 	} >&2
@@ -110,7 +118,18 @@ if grep "^LT_INIT" "${srcdir}/configure.ac" >/dev/null; then
 	("${LIBTOOL}" --version) < /dev/null > /dev/null 2>&1 || {
 		echo
 		echo '**Error**: You must have `libtool` installed. You can get it from'
-		echo 'ftp://ftp.gnu.org/pub/gnu/'
+		echo 'https://www.gnu.org/software/libtool/'
+		echo
+		DIE=1
+	} >&2
+fi
+
+if grep "^AM_GNU_GETTEXT" "${srcdir}/configure.ac" >/dev/null; then
+	grep "sed.*POTFILES" "${srcdir}/configure.ac" > /dev/null || \
+	gettextize --version < /dev/null > /dev/null 2>&1 || {
+		echo
+		echo '**Error**: You must have `gettext` installed. You can get it from'
+		echo 'https://www.gnu.org/software/gettext/'
 		echo
 		DIE=1
 	} >&2
@@ -121,7 +140,7 @@ if grep "^AM_GLIB_GNU_GETTEXT" "${srcdir}/configure.ac" >/dev/null; then
 	glib-gettextize --version < /dev/null > /dev/null 2>&1 || {
 		echo
 		echo '**Error**: You must have `glib` installed. You can get it from'
-		echo 'ftp://ftp.gtk.org/pub/gtk'
+		echo 'https://download.gnome.org/sources/glib/'
 		echo
 		DIE=1
 	} >&2
@@ -130,7 +149,7 @@ fi
 (automake --version) < /dev/null > /dev/null 2>&1 || {
 	echo
 	echo '**Error**: You must have `automake` installed. You can get it from'
-	echo 'ftp://ftp.gnu.org/pub/gnu/'
+	echo 'https://www.gnu.org/software/automake/'
 	echo
 	DIE=1
 	NO_AUTOMAKE=yes
@@ -141,7 +160,7 @@ fi
 test -n "${NO_AUTOMAKE}" || (aclocal --version) < /dev/null > /dev/null 2>&1 || {
 	echo
 	echo '**Error**: Missing `aclocal`. The version of `automake` installed doesn'\''t appear'
-	echo 'recent enough. You can get automake from ftp://ftp.gnu.org/pub/gnu/'
+	echo 'recent enough. You can get automake from https://www.gnu.org/software/automake/'
 	echo
 	DIE=1
 } >&2
@@ -193,6 +212,10 @@ for coin in `find "${srcdir}" -path "${srcdir}/CVS" -prune -o -name configure.ac
 			aclocalinclude="${ACLOCAL_FLAGS}"
 			[[ -d 'm4' ]] || mkdir 'm4'
 
+			if grep "^AM_GNU_GETTEXT" configure.ac >/dev/null; then
+				echo 'Running autopoint...'
+				autopoint --force
+			fi
 			if grep "^AM_GLIB_GNU_GETTEXT" configure.ac >/dev/null; then
 				echo "Creating ${dr}/aclocal.m4..."
 				test -r "${dr}/aclocal.m4" || touch "${dr}/aclocal.m4"

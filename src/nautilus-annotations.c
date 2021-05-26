@@ -49,10 +49,9 @@
 
 
 #ifdef ENABLE_NLS
-#include <libintl.h>
 #include <glib/gi18n-lib.h>
 #define I18N_INIT() \
-	bindtextdomain(GETTEXT_PACKAGE, NAUTILUS_ANNOTATIONS_LOCALEDIR)
+	bindtextdomain(GETTEXT_PACKAGE, PACKAGE_LOCALE_DIR)
 #else
 #define _(STRING) ((char *) (STRING))
 #define g_dngettext(DOMAIN, STRING1, STRING2, NUM) \
@@ -67,7 +66,6 @@
 |*| GLOBAL TYPES AND VARIABLES
 |*|
 \*/
-
 
 typedef struct {
 	GObject parent_slot;
@@ -94,12 +92,8 @@ static GtkCssProvider * annotations_css;
 #define G_FILE_ATTRIBUTE_METADATA_ANNOTATION "metadata::annotation"
 #endif
 
-/*  The CSS to add to the screen  */
-#define NAUTILUS_ANNOTATIONS_CSS PACKAGE_DATA_DIR "/style.css"
-
-/*  Both these constants are measured in number of unicode characters  */
-#define A8N_COLUMN_WRAP 40
-#define A8N_COLUMN_MAX_LENGTH 119
+/*  This constant is measured in number of unicode characters  */
+#define A8N_COLUMN_MAX_LENGTH 99
 
 
 
@@ -164,12 +158,14 @@ static bool destructive_action_confirm (
 }
 
 
-static void clear_files (
+static guint clear_files (
 	GList * file_selection
 ) {
 
 	GFile * location;
 	GError * eraserr = NULL;
+	guint noncleared = 0;
+	gchar * uri;
 
 	for (GList * iter = file_selection; iter; iter = iter->next) {
 
@@ -195,20 +191,26 @@ static void clear_files (
 
 		} else {
 
-			fprintf(
-				stderr,
-				"Nautilus Annotations: %s // %s\n",
+			uri = nautilus_file_info_get_uri(NAUTILUS_FILE_INFO(iter->data));
+
+			g_message(
+				"%s (%s) // %s",
 				_("Could not erase file's annotations"),
+				uri ? uri : _("unknown path"),
 				eraserr->message
 			);
 
+			g_free(uri);
 			g_clear_error(&eraserr);
+			noncleared++;
 
 		}
 
 		g_object_unref(location);
 
 	}
+
+	return noncleared;
 
 }
 
@@ -247,14 +249,14 @@ static guint annotation_session_export (
 	if (!*text_content) {
 
 		g_free(text_content);
-		clear_files(session->targets);
-		return 0;
+		return clear_files(session->targets);
 
 	}
 
 	guint unsaved = 0;
 	GFile * location;
 	GError * saverr = NULL;
+	gchar * uri;
 
 	for (GList * iter = session->targets; iter; iter = iter->next) {
 
@@ -279,13 +281,16 @@ static guint annotation_session_export (
 
 		} else {
 
-			fprintf(
-				stderr,
-				"Nautilus Annotations: %s // %s\n",
+			uri = nautilus_file_info_get_uri(NAUTILUS_FILE_INFO(iter->data));
+
+			g_message(
+				"%s (%s) // %s",
 				_("Could not save file's annotations"),
+				uri ? uri : _("unknown path"),
 				saverr->message
 			);
 
+			g_free(uri);
 			g_clear_error(&saverr);
 			unsaved++;
 
@@ -475,7 +480,6 @@ static void annotation_session_new_with_text (
 		tmpbuf = g_file_get_path(location);
 		g_object_unref(location);
 		header_title = _("Annotations");
-		header_subtitle = _("Unknown path");
 
 		if (tmpbuf) {
 
@@ -499,6 +503,15 @@ static void annotation_session_new_with_text (
 				*header_subtitle = '~';
 
 			}
+
+		} else {
+
+			/*  We don't have a path, but maybe we have a URI to show  */
+			header_subtitle = (
+				tmpbuf = nautilus_file_info_get_uri(
+					NAUTILUS_FILE_INFO(session->targets->data)
+				)
+			) ? tmpbuf : _("Unknown path");
 
 		}
 
@@ -608,12 +621,7 @@ static void on_annotate_menuitem_activate (
 
 	if (!file_selection) {
 
-		fprintf(
-			stderr,
-			"Nautilus Annotations: %s\n",
-			_("No files were selected to be annotated")
-		);
-
+		g_message("%s", _("No files were selected to be annotated"));
 		return;
 
 	}
@@ -623,6 +631,7 @@ static void on_annotate_menuitem_activate (
 	GFile * location;
 	GFileInfo * finfo;
 	GError * loaderr = NULL;
+	gchar * uri;
 
 	for (GList * iter = file_selection; iter; iter = iter->next) {
 
@@ -642,15 +651,18 @@ static void on_annotate_menuitem_activate (
 
 		if (!finfo) {
 
-			fprintf(
-				stderr,
-				"Nautilus Annotations: %s // %s\n",
+			uri = nautilus_file_info_get_uri(NAUTILUS_FILE_INFO(iter->data));
+
+			g_message(
+				"%s (%s) // %s",
 				_("Could not access file's annotations"),
+				uri ? uri : _("unknown path"),
 				loaderr->message
 			);
 
-			g_clear_error(&loaderr);
-			return;
+			g_free(uri);
+			g_error_free(loaderr);
+			goto free_and_exit;
 
 		}
 
@@ -710,6 +722,12 @@ static void on_annotate_menuitem_activate (
 		current_annotation
 	);
 
+
+	/* \                                /\
+	\ */     free_and_exit:            /* \
+	 \/     ______________________     \ */
+
+
 	g_free(current_annotation);
 
 }
@@ -727,12 +745,7 @@ static void on_unannotate_menuitem_activate (
 
 	if (!file_selection) {
 
-		fprintf(
-			stderr,
-			"Nautilus Annotations: %s\n",
-			_("No files were selected to be unannotated")
-		);
-
+		g_message("%s", _("No files were selected to be unannotated"));
 		return;
 
 	}
@@ -997,78 +1010,6 @@ static GList * nautilus_annotations_get_background_items (
 }
 
 
-static inline void wrap_text_utf8 (
-	gchar * const str,
-	const gsize max
-) {
-
-	gsize uprevlen, ucurrlen = 0, ulinelen = 0;
-	gchar * currptr, * nextptr = str;
-
-
-	/* \                                /\
-	\ */     keep_going:               /* \
-	 \/     ______________________     \ */
-
-
-	ulinelen++;
-
-
-	/* \                                /\
-	\ */     new_line:                 /* \
-	 \/     ______________________     \ */
-
-
-	currptr = nextptr;
-	nextptr = g_utf8_next_char(currptr);
-	ucurrlen++;
-
-	switch (*currptr) {
-
-		case '\0':
-
-			return;
-
-		case '\n':
-
-			ulinelen = 1;
-			goto new_line;
-
-		case ' ':
-		case '\t':
-		case '\f':
-		case '\v':
-		case '\r':
-
-			uprevlen = ucurrlen;
-
-			while (*nextptr && !isspace(*nextptr)) {
-
-				ucurrlen++;
-				nextptr = g_utf8_next_char(nextptr);
-
-			}
-
-			if (ucurrlen + ulinelen > uprevlen + max) {
-
-				*currptr = '\n';
-				ulinelen = ucurrlen - uprevlen + 1;
-				goto new_line;
-
-			}
-
-			ulinelen += ucurrlen - uprevlen;
-			/*  No case break (fallthrough)  */
-
-		default:
-
-			goto keep_going;
-
-	}
-
-}
-
-
 static NautilusOperationResult nautilus_annotations_update_file_info (
 	NautilusInfoProvider * const info_provider,
 	NautilusFileInfo * const nautilus_file,
@@ -1103,35 +1044,38 @@ static NautilusOperationResult nautilus_annotations_update_file_info (
 
 		nautilus_file_info_add_emblem(nautilus_file, "emblem-annotations");
 
-		gchar * wrapped_annotations;
-		gsize a8n_size = strlen(a8n_probe);
+		if (
+			g_utf8_strlen(
+				a8n_probe,
+				strlen(a8n_probe)
+			) > A8N_COLUMN_MAX_LENGTH
+		) {
 
-		if (g_utf8_strlen(a8n_probe, a8n_size) > A8N_COLUMN_MAX_LENGTH) {
-
-			a8n_size = g_utf8_offset_to_pointer(
+			gsize a8n_size = g_utf8_offset_to_pointer(
 				a8n_probe,
 				A8N_COLUMN_MAX_LENGTH
 			) - a8n_probe;
 
-			wrapped_annotations = g_malloc(a8n_size + 4);
-			memcpy(wrapped_annotations, a8n_probe, a8n_size);
-			memcpy(wrapped_annotations + a8n_size, "\342\200\246", 4);
+			gchar * a8n_preview = g_malloc(a8n_size + 4);
+			memcpy(a8n_preview, a8n_probe, a8n_size);
+			memcpy(a8n_preview + a8n_size, "\342\200\246", 4);
+
+			nautilus_file_info_add_string_attribute(
+				nautilus_file,
+				"annotations",
+				a8n_preview
+			);
+
+			g_free(a8n_preview);
 
 		} else {
 
-			wrapped_annotations = g_memdup2(a8n_probe, a8n_size + 1);
-
+			nautilus_file_info_add_string_attribute(
+				nautilus_file,
+				"annotations",
+				a8n_probe
+			);
 		}
-
-		wrap_text_utf8(wrapped_annotations, A8N_COLUMN_WRAP);
-
-		nautilus_file_info_add_string_attribute(
-			nautilus_file,
-			"annotations",
-			wrapped_annotations
-		);
-
-		g_free(wrapped_annotations);
 
 	} else {
 
@@ -1313,17 +1257,73 @@ void nautilus_module_initialize (
 	*provider_types = nautilus_annotations_get_type();
 	annotations_css = gtk_css_provider_new();
 
-	gtk_css_provider_load_from_path(
-		annotations_css,
-		NAUTILUS_ANNOTATIONS_CSS,
+	/*  Search for the CSS in `~/.local/share/nautilus-annotations/` first; if
+		not found assume that `/usr/share/nautilus-annotations/` is where the
+		CSS will be found  */
+
+	gchar * local_css_path = g_build_filename(
+		g_get_user_data_dir(),
+		PACKAGE_TARNAME,
+		STYLESHEET_FILENAME,
 		NULL
 	);
 
-	gtk_style_context_add_provider_for_screen(
-		gdk_display_get_default_screen(gdk_display_get_default()),
-		GTK_STYLE_PROVIDER(annotations_css),
-		GTK_STYLE_PROVIDER_PRIORITY_APPLICATION
+	GFile * css_file = g_file_new_for_path(local_css_path);
+
+	g_free(local_css_path);
+
+	GFileInfo * finfo = g_file_query_info(
+		css_file,
+		G_FILE_ATTRIBUTE_ACCESS_CAN_READ,
+		G_FILE_QUERY_INFO_NONE,
+		NULL,
+		NULL
 	);
+
+	enum {
+		FILE_IS_GOOD,
+		FILE_IS_MISSING,
+		FILE_IS_UNREADABLE
+	};
+
+	switch(
+		!finfo ? FILE_IS_MISSING
+		: !g_file_info_get_attribute_boolean(
+			finfo,
+			G_FILE_ATTRIBUTE_ACCESS_CAN_READ
+		) ? FILE_IS_UNREADABLE
+		: FILE_IS_GOOD
+	) {
+
+		case FILE_IS_UNREADABLE:
+
+			g_object_unref(finfo);
+			/*  No case break (fallthrough)  */
+
+		case FILE_IS_MISSING:
+
+			g_object_unref(css_file);
+
+			css_file = g_file_new_for_path(
+				PACKAGE_DATA_DIR G_DIR_SEPARATOR_S STYLESHEET_FILENAME
+			);
+
+			/*  No case break (fallthrough)  */
+
+		default:
+
+			gtk_css_provider_load_from_file(annotations_css, css_file, NULL);
+			g_object_unref(css_file);
+
+			gtk_style_context_add_provider_for_screen(
+				gdk_display_get_default_screen(gdk_display_get_default()),
+				GTK_STYLE_PROVIDER(annotations_css),
+				GTK_STYLE_PROVIDER_PRIORITY_APPLICATION
+			);
+
+			/*  No case break (last case)  */
+
+	}
 
 }
 

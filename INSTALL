@@ -35,3 +35,10 @@ This plugin depends on the following packages:
 
 Please make sure that they are present before compiling the source code.
 
+
+CSS themes
+----------
+
+Use `./configure --with-theme=...` for choosing a CSS theme. For more
+information see `themes/README.md`
+

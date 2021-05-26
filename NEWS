@@ -2,6 +2,23 @@ NEWS
 ====
 
 
+## 0.8.0
+
+* A selection of CSS themes has been created and the `notebook` theme has been
+  chosen as the default theme
+* It is now possible to override the system-wide CSS
+  (`/usr/share/nautilus-annotations/style.css`) by placing a CSS in the home
+  directory (`~/.local/share/nautilus-annotations/style.css`) -- the extension
+  checks in the home directory first, if no theme is found it falls back to the
+  default CSS
+* A `with-theme=...` option has been added to the `configure` script for
+  selecting a different CSS theme during the build process; with this comes a
+  `--without-theme` option too, for relying solely on the current GTK theme and
+  not using any extension-specific one
+* Internationalization does not depend on **XDG intltool** anymore, but only on
+  **GNU gettext**
+
+
 ## 0.7.0
 
 * An "Annotations" column has been added to Nautilus' list view

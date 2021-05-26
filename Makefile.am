@@ -3,6 +3,8 @@
 
 ACLOCAL_AMFLAGS = -I m4
 
+AM_DISTCHECK_CONFIGURE_FLAGS = --without-nautilus-libdir
+
 SUBDIRS = \
 	src
 
@@ -15,8 +17,13 @@ dist_doc_DATA = \
 	docs/shortcuts.md \
 	docs/styling.md
 
-dist_pkgdata_DATA = \
-	extension-data/style.css
+themesdir = $(docdir)/css-factory
+dist_themes_DATA = \
+	themes/README.md \
+	@CSS_THEMES@
+
+nodist_pkgdata_DATA = \
+	no-dist/style.css
 
 # Launch
 #
@@ -124,11 +131,6 @@ nobase_dist_data_DATA = \
 	icons/hicolor/512x512/actions/unannotate.png \
 	icons/hicolor/512x512/emblems/emblem-annotations.png
 
-INTLTOOL_FILES = \
-	intltool-extract.in \
-	intltool-merge.in \
-	intltool-update.in
-
 EXTRA_DIST = \
 	ChangeLog.md \
 	INSTALL \
@@ -136,20 +138,7 @@ EXTRA_DIST = \
 	README.md \
 	bootstrap \
 	package.json \
-	noinst \
-	.editorconfig \
-	$(INTLTOOL_FILES)
-
-DISTCLEANFILES = \
-	intltool-extract \
-	intltool-merge \
-	intltool-update \
-	po/.intltool-merge-cache
-
-
-# Shell expansion is supported here
-_distclean_dirs_ = \
-	'po/backups'
+	.editorconfig
 
 
 if NLS_ENABLED
@@ -165,9 +154,71 @@ EXTRA_DIST += \
 endif !NLS_ENABLED
 
 
-# Remove `doc` and `pkgdatadir` on uninstall
+BUILT_SOURCES = \
+	no-dist/style.css
+
+_clean_dirs_ = \
+	no-dist
+
+# Shell expansion is supported here
+_distclean_dirs_ = \
+	'po/backups'
+
+# Shell expansion is supported here
+_bootstrapclean_dirs_ = \
+	'autom4te.cache' \
+	'build-aux' \
+	'm4'
+
+# Shell expansion is supported here
+_bootstrapclean_files_ = \
+	*'~' \
+	'ABOUT-NLS' \
+	'aclocal.m4' \
+	'compile' \
+	'config'.* \
+	'configure' \
+	'depcomp' \
+	'install-sh' \
+	'libtool' \
+	'ltmain.sh' \
+	'missing' \
+	'po/boldquot.sed' \
+	'po/en@boldquot.header' \
+	'po/en@quot.header' \
+	'po/insert-header.sin' \
+	'po'/*'~' \
+	'po/Makefile.in.in' \
+	'po/Makevars.template' \
+	'po/quot.sed' \
+	'po/remove-potcdate.sin' \
+	'po/Rules-quot'
+
+
+if HAVE_FIND
+
+_bootstrapclean_dirs_ += \
+	`$(FIND) -L . -type d -name .deps`
+
+
+_bootstrapclean_files_ += \
+	`$(FIND) -L . -type f -name 'Makefile.in'`
+
+endif
+
+
+no-dist/style.css: $(CSS_THEME)
+	(test -d no-dist || (rm -f no-dist && $(MKDIR_P) no-dist)) && \
+	cp '$(CSS_THEME)' '$@';
+
+
+# Remove `$(docdir)` and `$(pkgdatadir)` on uninstall
 uninstall-local:
-	-rm -r '$(DESTDIR)$(docdir)' '$(DESTDIR)$(pkgdatadir)'
+	-rm -r '$(DESTDIR)$(docdir)' '$(DESTDIR)$(pkgdatadir)';
+
+
+clean-local:
+	-rm -rf $(_clean_dirs_);
 
 
 distclean-local:
@@ -177,13 +228,19 @@ distclean-local:
 # Update translations
 .PHONY: i18n-update
 i18n-update:
-	(cd 'po' && intltool-update -p --gettext-package='$(PACKAGE_TARNAME)' \
-	&& mkdir -p 'backups' && grep -o '^\s*\w\S\+' 'LINGUAS' | while read \
-	coin; do mv "$${coin}.po" "$${coin}.po.bak" && msgmerge \
-	"$${coin}.po.bak" '$(PACKAGE_TARNAME).pot' > "$${coin}.po" && mv \
-	"$${coin}.po.bak" 'backups' && sed -i \
-	's/"Project-Id-Version:\s*\([0-9]\+\(\.[0-9]\+\(\.[0-9]\)\?\)\?\)\?\+\\n"/"Project-Id-Version: @PACKAGE_VERSION@\\n"/' \
-	"$${coin}.po"; done; rm '$(PACKAGE_TARNAME).pot')
+	$(MKDIR_P) 'po/backups' && $(GREP) -o '^\s*\w\S\+' 'po/LINGUAS' | \
+	while read _i_; do cp "po/$${_i_}.po" "po/backups/$${_i_}.po.bak" && \
+	$(MAKE) -C 'po' "$${_i_}.po" && sed -i \
+	's/"Project-Id-Version:.*$$/"Project-Id-Version: @PACKAGE_VERSION@\\n"/' \
+	"po/$${_i_}.po"; done;
+
+
+# Make the source directory depend on Autotools and a `bootstrap` script
+.PHONY: bootstrap-clean
+bootstrap-clean: maintainer-clean
+	-rm -rf $(_bootstrapclean_dirs_); rm -f $(_bootstrapclean_files_); \
+	(cd '$(srcdir)' && rm -rf $(_bootstrapclean_dirs_); \
+	rm -f $(_bootstrapclean_files_));
 
 
 # EOF

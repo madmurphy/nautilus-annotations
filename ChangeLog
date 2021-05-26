@@ -2,6 +2,30 @@ Change Log
 ==========
 
 
+## 0.8.0 (2021-05-27)
+
+Changes:
+
+* A selection of CSS themes has been created and the `notebook` theme has been
+  chosen as the default theme
+* It is now possible to override the system-wide CSS
+  (`/usr/share/nautilus-annotations/style.css`) by placing a CSS in the home
+  directory (`~/.local/share/nautilus-annotations/style.css`) -- the extension
+  checks in the home directory first, if no theme is found it falls back to the
+  default CSS
+* Text wrap has been removed from the "Annotations" column -- the column
+  appearance is something that should be managed upstream by Nautilus
+* Use of `fprintf()` for message logging has been dropped in favor of GLib's
+  `g_message()`
+* Code review
+* A `with-theme=...` option has been added to the `configure` script for
+  selecting a different CSS theme during the build process; with this comes a
+  `--without-theme` option too, for relying solely on the current GTK theme and
+  not using any extension-specific one
+* Internationalization does not depend on **XDG intltool** anymore, but only on
+  **GNU gettext**
+
+
 ## 0.7.1 (2021-05-23)
 
 Changes:
