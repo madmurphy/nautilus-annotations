@@ -183,6 +183,7 @@ _bootstrapclean_files_ = \
 	'libtool' \
 	'ltmain.sh' \
 	'missing' \
+	'po/@PACKAGE_TARNAME@.pot' \
 	'po/boldquot.sed' \
 	'po/en@boldquot.header' \
 	'po/en@quot.header' \

@@ -54,18 +54,21 @@ tab, the annotations will be styled as yellow sticky notes:
 dialog.nautilus-annotations-dialog,
 dialog.nautilus-annotations-dialog .titlebar {
 	border: none;
-	background: #fff394;
+	background-image: none;
+	background-color: #fff394;
 	color: #ad5f00;
 }
 
 dialog.nautilus-annotations-dialog selection {
-	background: #ad5f00;
+	background-image: none;
+	background-color: #ad5f00;
 	color: #fff394;
 }
 
 dialog.nautilus-annotations-dialog text,
 dialog.nautilus-annotations-dialog button {
-	background: transparent;
+	background-image: none;
+	background-color: transparent;
 	color: #ad5f00;
 }
 
@@ -77,7 +80,7 @@ dialog.nautilus-annotations-dialog button.close {
 
 dialog.nautilus-annotations-dialog button.nautilus-annotations-discard {
 	padding: 1px 7px;
-	background: #ad5f00;
+	background-color: #ad5f00;
 	color: #fff394;
 	border: none;
 	box-shadow: 0 0 2px 2px #ad5f00;
@@ -85,6 +88,7 @@ dialog.nautilus-annotations-dialog button.nautilus-annotations-discard {
 
 textview.nautilus-annotations-view {
 	font-family: monospace;
+	padding: 0;
 }
 ```
 

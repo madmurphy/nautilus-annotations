@@ -9,7 +9,7 @@ dnl  **************************************************************************
 AC_PREREQ([2.69])
 
 AC_INIT([Nautilus Annotations],
-	[0.8.0],
+	[0.8.1],
 	[madmurphy333@gmail.com],
 	[nautilus-annotations],
 	[https://gitlab.gnome.org/madmurphy/nautilus-annotations])
@@ -91,7 +91,7 @@ dnl  **************************************************************************
 
 AM_GNU_GETTEXT([external])
 
-AM_GNU_GETTEXT_VERSION([0.21])
+AM_GNU_GETTEXT_VERSION([0.19])
 
 AM_CONDITIONAL([NLS_ENABLED], [test "x${USE_NLS}" != xno])
 

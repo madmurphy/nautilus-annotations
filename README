@@ -65,10 +65,9 @@ The package needs help with internationalization. If a translation into your
 language is missing and you wish to get involved, here is what to do.
 
 Let's say you want to create a Dutch translation of **Nautilus Annotations**
-(`nl`). The extension comes with only a bunch of strings to translate. First
-thing to do is to make sure that **GNU Autotools** and **GNU gettext** are
-installed on your system. Then clone this repository and launch the following
-commands:
+(`nl`). First thing to do is to make sure that **GNU Autotools** and **GNU
+gettext** are installed on your system. Then clone this repository and launch
+the following commands:
 
 ``` sh
 ./bootstrap

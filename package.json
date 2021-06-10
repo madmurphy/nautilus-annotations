@@ -1,9 +1,9 @@
 {
 	"name": "nautilus-annotations",
-	"version": "0.8.0",
+	"version": "0.8.1",
 	"description": "Annotate files and directories",
 	"homepage": "https://gitlab.gnome.org/madmurphy/nautilus-annotations",
-	"author": "madmurphy",
+	"author": "madmurphy333@gmail.com",
 	"license": "GPL-3.0-or-later",
 	"repository": {
 		"type": "git",
@@ -15,7 +15,7 @@
 		"gtksourceview4": "*",
 	},
 	"devDependencies": {
-		"gettext": "*",
+		"gettext": ">=0.19",
 		"pkgconf": "*"
 	},
 	"src": [

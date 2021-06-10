@@ -159,7 +159,7 @@ static bool destructive_action_confirm (
 
 
 static guint clear_files (
-	GList * file_selection
+	GList * const file_selection
 ) {
 
 	GFile * location;
@@ -227,7 +227,7 @@ static void annotation_session_destroy (
 
 
 static guint annotation_session_export (
-	NautilusAnnotationsSession * session
+	NautilusAnnotationsSession * const session
 ) {
 
 	GtkTextIter text_start, text_end;
@@ -307,7 +307,7 @@ static guint annotation_session_export (
 
 
 static void annotation_session_save (
-	NautilusAnnotationsSession * session
+	NautilusAnnotationsSession * const session
 ) {
 
 	if (!annotation_session_export(session)) {
@@ -323,7 +323,7 @@ static void annotation_session_save (
 
 
 static void annotation_session_exit (
-	NautilusAnnotationsSession * session
+	NautilusAnnotationsSession * const session
 ) {
 
 	if (
@@ -342,7 +342,7 @@ static void annotation_session_exit (
 
 
 static void annotation_session_discard (
-	NautilusAnnotationsSession * session
+	NautilusAnnotationsSession * const session
 ) {
 
 	if (
@@ -401,7 +401,7 @@ static void on_text_modified_state_change (
 static void annotation_session_new_with_text (
 	GtkWindow * const parent,
 	GList * const target_files,
-	/*  nullable  */  gchar * initial_text
+	/*  nullable  */  const gchar * const initial_text
 ) {
 
 	NautilusAnnotationsSession
