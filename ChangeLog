@@ -2,6 +2,15 @@ Change Log
 ==========
 
 
+## 0.8.2 (2021-09-03)
+
+Changes:
+
+* The extension's menu entries have been prevented from appearing in context
+  menus of locations that do not support annotations (e.g.: search mode)
+* A typo has been fixed
+
+
 ## 0.8.1 (2021-06-11)
 
 Changes:

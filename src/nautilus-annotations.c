@@ -27,7 +27,7 @@
 
 
 #ifdef HAVE_CONFIG_H
-#include <config.h>
+#include "config.h"
 #endif
 
 #include <stdbool.h>
@@ -813,9 +813,9 @@ static GList * nautilus_annotations_get_file_items (
 
 		if (!finfo) {
 
-			/*  Cannot get file's annotations  */
+			/*  File does not support annotations  */
 
-			continue;
+			return NULL;
 
 		}
 
