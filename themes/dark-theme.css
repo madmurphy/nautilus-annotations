@@ -39,16 +39,14 @@ dialog.nautilus-annotations-dialog button.nautilus-annotations-discard {
 	padding: 1px 7px;
 	border: none;
 	background-color: #ddd;
-	box-shadow: 0 0 2px 2px #ddd;
 	color: #2e3436;
-	transition: background-color .3s 0s linear, box-shadow  .3s 0s linear;
+	transition: background-color .3s 0s linear;
 }
 
 dialog.nautilus-annotations-dialog button.nautilus-annotations-discard:hover {
-	background-color: #fff;
-	box-shadow: 0 0 2px 2px #fff;
-	color: #000;
-	transition: background-color 1s 0s linear, box-shadow  1s 0s linear;
+	background-color: #eaeaea;
+	color: #2e3436;
+	transition: background-color .5s 0s linear;
 }
 
 textview.nautilus-annotations-view {

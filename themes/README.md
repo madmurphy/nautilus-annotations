@@ -24,8 +24,8 @@ Whenever the `~/.local/share/nautilus-annotations/style.css` file is present
 the `/usr/share/nautilus-annotations/style.css` file is ignored.
 
 Please bear in mind that extension-specific themes have always higher priority
-over GTK themes; if you want to style this extension via the latter or simply
-want to experiment with CSS globally you should not install any theme. An
+over GTK themes; if you want to style this extension via the latter, or simply
+want to experiment with CSS globally, you should not install any theme. An
 unthemed installation is when the content of the `style.css` file used matches
 the content of the `no-theme.css` file from this directory (you can pass a
 `--without-theme` option to the `configure` script for that).

@@ -67,6 +67,7 @@
 |*|
 \*/
 
+
 typedef struct {
 	GObject parent_slot;
 } NautilusAnnotations;
@@ -87,8 +88,8 @@ static GType nautilus_annotations_type;
 static GObjectClass * parent_class;
 static GtkCssProvider * annotations_css;
 
-#ifndef G_FILE_ATTRIBUTE_METADATA_ANNOTATION
 /*  This metadata key was originally used by Nautilus  */
+#ifndef G_FILE_ATTRIBUTE_METADATA_ANNOTATION
 #define G_FILE_ATTRIBUTE_METADATA_ANNOTATION "metadata::annotation"
 #endif
 
@@ -995,17 +996,15 @@ static GList * nautilus_annotations_get_background_items (
 	NautilusFileInfo * const current_folder
 ) {
 
-	GList
-		* file_selection = g_list_append(NULL, current_folder),
-		* menu_items = nautilus_annotations_get_file_items(
-			menu_provider,
-			nautilus_window,
-			file_selection
-		);
-
-	g_list_free(file_selection);
-
-	return menu_items;
+	return nautilus_annotations_get_file_items(
+		menu_provider,
+		nautilus_window,
+		&((GList) {
+			.data = current_folder,
+			.next = NULL,
+			.prev = NULL
+		})
+	);
 
 }
 
@@ -1257,20 +1256,20 @@ void nautilus_module_initialize (
 	*provider_types = nautilus_annotations_get_type();
 	annotations_css = gtk_css_provider_new();
 
-	/*  Search for the CSS in `~/.local/share/nautilus-annotations/` first; if
-		not found assume that `/usr/share/nautilus-annotations/` is where the
-		CSS will be found  */
+	/*
 
-	gchar * local_css_path = g_build_filename(
+	Search for the CSS in `~/.local/share/nautilus-annotations/` first; if not
+	found assume that `/usr/share/nautilus-annotations/` is where the CSS will
+	be found
+
+	*/
+
+	GFile * css_file = g_file_new_build_filename(
 		g_get_user_data_dir(),
 		PACKAGE_TARNAME,
 		STYLESHEET_FILENAME,
 		NULL
 	);
-
-	GFile * css_file = g_file_new_for_path(local_css_path);
-
-	g_free(local_css_path);
 
 	GFileInfo * finfo = g_file_query_info(
 		css_file,
@@ -1304,8 +1303,10 @@ void nautilus_module_initialize (
 
 			g_object_unref(css_file);
 
-			css_file = g_file_new_for_path(
-				PACKAGE_DATA_DIR G_DIR_SEPARATOR_S STYLESHEET_FILENAME
+			css_file = g_file_new_build_filename(
+				PACKAGE_DATA_DIR,
+				STYLESHEET_FILENAME,
+				NULL
 			);
 
 			/*  No case break (fallthrough)  */

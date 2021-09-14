@@ -1,7 +1,7 @@
 Styling
 =======
 
-**Nautilus Annotations** provides three unique CSS classes:
+**Nautilus Annotations** declares three unique CSS classes:
 
 * `dialog.nautilus-annotations-dialog` (the annotations window)
 * `textview.nautilus-annotations-view` (the annotations text area)
@@ -79,7 +79,7 @@ dialog.nautilus-annotations-dialog button.close {
 }
 
 dialog.nautilus-annotations-dialog button.nautilus-annotations-discard {
-	padding: 1px 7px;
+	padding: 0 6px;
 	background-color: #ad5f00;
 	color: #fff394;
 	border: none;
