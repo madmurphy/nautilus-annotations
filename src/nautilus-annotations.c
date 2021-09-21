@@ -93,6 +93,10 @@ static GtkCssProvider * annotations_css;
 #define G_FILE_ATTRIBUTE_METADATA_ANNOTATION "metadata::annotation"
 #endif
 
+/*  Default size of the annotation window when no workarea is available  */
+#define A8N_WIN_FALLBACK_WIDTH 300
+#define A8N_WIN_FALLBACK_HEIGHT 400
+
 /*  This constant is measured in number of unicode characters  */
 #define A8N_COLUMN_MAX_LENGTH 99
 
@@ -464,7 +468,10 @@ static void annotation_session_new_with_text (
 		"nautilus-annotations-discard"
 	);
 
-	gchar * header_subtitle, * tmpbuf = NULL;
+	gchar
+		* header_subtitle,
+		* tmpbuf = NULL;
+
 	const gchar * header_title;
 
 	if (session->targets->next) {
@@ -507,7 +514,8 @@ static void annotation_session_new_with_text (
 
 		} else {
 
-			/*  We don't have a path, but maybe we have a URI to show  */
+			/*  We don't have a path, but maybe we have a URI to show...  */
+
 			header_subtitle = (
 				tmpbuf = nautilus_file_info_get_uri(
 					NAUTILUS_FILE_INFO(session->targets->data)
@@ -539,8 +547,8 @@ static void annotation_session_new_with_text (
 
 	gtk_window_set_default_size(
 		GTK_WINDOW(a8n_dialog),
-		workarea.width ? workarea.width * 2 / 3 : 300,
-		workarea.height ? workarea.height * 2 / 3 : 400
+		workarea.width ? workarea.width * 2 / 3 : A8N_WIN_FALLBACK_WIDTH,
+		workarea.height ? workarea.height * 2 / 3 : A8N_WIN_FALLBACK_HEIGHT
 	);
 
 	GtkWidget
@@ -879,7 +887,7 @@ static GList * nautilus_annotations_get_file_items (
 				"Choose an action for the objects' annotations",
 				sellen
 			),
-			"unannotate"
+			NULL
 		);
 
 		nautilus_menu_item_set_submenu(item_annotations, menu_annotations);

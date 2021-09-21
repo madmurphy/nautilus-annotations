@@ -232,7 +232,7 @@ i18n-update:
 	$(MKDIR_P) 'po/backups' && $(GREP) -o '^\s*\w\S\+' 'po/LINGUAS' | \
 	while read _i_; do cp "po/$${_i_}.po" "po/backups/$${_i_}.po.bak" && \
 	$(MAKE) -C 'po' "$${_i_}.po" && sed -i \
-	's/"Project-Id-Version:.*$$/"Project-Id-Version: @PACKAGE_VERSION@\\n"/' \
+	's/"Project-Id-Version:.*$$/"Project-Id-Version: @PACKAGE_TARNAME@ @PACKAGE_VERSION@\\n"/' \
 	"po/$${_i_}.po"; done;
 
 

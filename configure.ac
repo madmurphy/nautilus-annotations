@@ -9,7 +9,7 @@ dnl  **************************************************************************
 AC_PREREQ([2.69])
 
 AC_INIT([Nautilus Annotations],
-	[0.8.3],
+	[0.8.4],
 	[madmurphy333@gmail.com],
 	[nautilus-annotations],
 	[https://gitlab.gnome.org/madmurphy/nautilus-annotations])
@@ -34,13 +34,13 @@ AC_PROG_CC
 
 AC_PROG_GREP
 
-PKG_CHECK_MODULES([NAUTILUS_ANNOTATIONS],
-	[glib-2.0 libnautilus-extension gtksourceview-4])
-
 AC_CHECK_PROG([HAVE_PKGCONFIG], [pkg-config], [yes], [no])
 
 AS_IF([test "x${HAVE_PKGCONFIG}" = xno],
 	[AC_MSG_ERROR([you need to have pkgconfig installed!])])
+
+PKG_CHECK_MODULES([NAUTILUS_ANNOTATIONS],
+	[glib-2.0 libnautilus-extension gtksourceview-4])
 
 AC_ARG_VAR([FIND], [Unix find utility])
 
