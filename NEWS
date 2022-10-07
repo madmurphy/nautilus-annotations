@@ -2,6 +2,12 @@ NEWS
 ====
 
 
+## 0.9.0
+
+* The `notebook-double-margin` CSS theme, consisting in a symmetric version of
+  the `notebook` theme, has been added to the repository
+
+
 ## 0.8.0
 
 * A selection of CSS themes has been created and the `notebook` theme has been

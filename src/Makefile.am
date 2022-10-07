@@ -7,7 +7,8 @@ AM_CPPFLAGS = \
 	"-DG_LOG_DOMAIN=\"NautilusAnnotations\""
 
 AM_CFLAGS = \
-	-Wall\
+	-Wall \
+	-Wextra \
 	-g \
 	-pedantic \
 	$(WARN_CFLAGS) \

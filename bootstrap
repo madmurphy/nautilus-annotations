@@ -141,7 +141,7 @@ if grep "^AM_GLIB_GNU_GETTEXT" "${srcdir}/configure.ac" >/dev/null; then
 	glib-gettextize --version < /dev/null > /dev/null 2>&1 || {
 		echo
 		echo '**Error**: You must have `glib` installed. You can get it from'
-		echo 'https://download.gnome.org/sources/glib/'
+		echo 'https://gitlab.gnome.org/GNOME/glib'
 		echo
 		DIE=1
 	} >&2

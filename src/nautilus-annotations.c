@@ -68,6 +68,8 @@
 \*/
 
 
+#define UNUSED(ARG) (void)(ARG)
+
 typedef struct {
 	GObject parent_slot;
 } NautilusAnnotations;
@@ -111,9 +113,9 @@ static GtkCssProvider * annotations_css;
 
 static bool destructive_action_confirm (
 	GtkWindow * const parent,
-	const char * const primary_text,
-	const char * const secondary_text,
-	/*  nullable  */  const char * const destructive_text
+	const gchar * const primary_text,
+	const gchar * const secondary_text,
+	/*  nullable  */  const gchar * const destructive_text
 ) {
 
 	GtkDialog * const question_dialog =
@@ -374,6 +376,8 @@ static void on_annotation_dialog_response (
 	NautilusAnnotationsSession * const session
 ) {
 
+    UNUSED(dialog);
+
 	switch (response_id) {
 
 		case GTK_RESPONSE_REJECT:
@@ -573,14 +577,14 @@ static void annotation_session_new_with_text (
 	);
 
 	g_signal_connect(
-		a8n_dialog,
+		G_OBJECT(a8n_dialog),
 		"response",
 		G_CALLBACK(on_annotation_dialog_response),
 		session
 	);
 
 	g_signal_connect(
-		session->annotation_text,
+		G_OBJECT(session->annotation_text),
 		"modified-changed",
 		G_CALLBACK(on_text_modified_state_change),
 		session
@@ -635,7 +639,7 @@ static void on_annotate_menuitem_activate (
 
 	}
 
-	const char * a8n_probe;
+	const gchar * a8n_probe;
 	gchar * current_annotation = NULL;
 	GFile * location;
 	GFileInfo * finfo;
@@ -780,6 +784,8 @@ static GList * nautilus_annotations_get_file_items (
 	GtkWidget * const nautilus_window,
 	GList * const file_selection
 ) {
+
+	UNUSED(menu_provider);
 
 	#define NA_IS_FILE_SELECTION 1
 	#define NA_IS_DIRECTORY_SELECTION 2
@@ -926,7 +932,7 @@ static GList * nautilus_annotations_get_file_items (
 		);
 
 		g_signal_connect(
-			subitem_iter,
+			G_OBJECT(subitem_iter),
 			"activate",
 			G_CALLBACK(on_unannotate_menuitem_activate),
 			nautilus_window
@@ -973,7 +979,7 @@ static GList * nautilus_annotations_get_file_items (
 	}
 
 	g_signal_connect(
-		item_annotate,
+		G_OBJECT(item_annotate),
 		"activate",
 		G_CALLBACK(on_annotate_menuitem_activate),
 		nautilus_window
@@ -1024,6 +1030,10 @@ static NautilusOperationResult nautilus_annotations_update_file_info (
 	NautilusOperationHandle ** const handle
 ) {
 
+	UNUSED(info_provider);
+	UNUSED(update_complete);
+	UNUSED(handle);
+
 	GFile * location = nautilus_file_info_get_location(nautilus_file);
 
 	GFileInfo * const finfo = g_file_query_info(
@@ -1042,7 +1052,7 @@ static NautilusOperationResult nautilus_annotations_update_file_info (
 
 	}
 
-	const char * a8n_probe = g_file_info_get_attribute_string(
+	const gchar * a8n_probe = g_file_info_get_attribute_string(
 		finfo,
 		G_FILE_ATTRIBUTE_METADATA_ANNOTATION
 	);
@@ -1104,6 +1114,8 @@ static GList * nautilus_annotations_get_columns (
 	NautilusColumnProvider * const column_provider
 ) {
 
+	UNUSED(column_provider);
+
 	NautilusColumn * column = nautilus_column_new(
 		"annotations",
 		"annotations",
@@ -1121,6 +1133,8 @@ static void nautilus_annotations_type_info_provider_iface_init (
 	gpointer const iface_data
 ) {
 
+	UNUSED(iface_data);
+
 	iface->update_file_info = nautilus_annotations_update_file_info;
 
 }
@@ -1130,6 +1144,8 @@ static void nautilus_annotations_menu_provider_iface_init (
 	NautilusMenuProviderIface * const iface,
 	gpointer const iface_data
 ) {
+
+	UNUSED(iface_data);
 
 	iface->get_file_items = nautilus_annotations_get_file_items;
 	iface->get_background_items = nautilus_annotations_get_background_items;
@@ -1142,6 +1158,8 @@ static void nautilus_annotations_column_provider_iface_init (
 	gpointer const iface_data
 ) {
 
+	UNUSED(iface_data);
+
 	iface->get_columns = nautilus_annotations_get_columns;
 
 }
@@ -1151,6 +1169,8 @@ static void nautilus_annotations_class_init (
 	NautilusAnnotationsClass * const nautilus_annotations_class,
 	gpointer const class_data
 ) {
+
+	UNUSED(class_data);
 
 	parent_class = g_type_class_peek_parent(nautilus_annotations_class);
 
@@ -1307,6 +1327,7 @@ void nautilus_module_initialize (
 			g_object_unref(finfo);
 			/*  No case break (fallthrough)  */
 
+		/* fallthrough */
 		case FILE_IS_MISSING:
 
 			g_object_unref(css_file);
@@ -1319,6 +1340,7 @@ void nautilus_module_initialize (
 
 			/*  No case break (fallthrough)  */
 
+		/* fallthrough */
 		default:
 
 			gtk_css_provider_load_from_file(annotations_css, css_file, NULL);

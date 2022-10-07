@@ -2,6 +2,15 @@ Change Log
 ==========
 
 
+## 0.9.0 (2022-10-07)
+
+Changes:
+
+* The `notebook-double-margin` CSS theme, consisting in a symmetric version of
+  the `notebook` theme, has been added to the repository
+* Code review
+
+
 ## 0.8.4 (2021-09-21)
 
 Changes:

@@ -101,5 +101,5 @@ For more information, please refer to the [GTK CSS documentation][3].
 
   [1]: https://gitlab.gnome.org/madmurphy/nautilus-annotations
   [2]: https://gitlab.gnome.org/madmurphy/nautilus-annotations/issues
-  [3]: https://developer.gnome.org/gtk3/stable/chap-css-overview.html
+  [3]: https://docs.gtk.org/gtk3/css-overview.html
 
