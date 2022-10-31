@@ -2,6 +2,11 @@ NEWS
 ====
 
 
+## 0.10.0
+
+* The extension has been ported to `libnautilus-extension-4`
+
+
 ## 0.9.0
 
 * The `notebook-double-margin` CSS theme, consisting in a symmetric version of

@@ -11,4 +11,3 @@ Keyboard shortcuts
 * `Ctrl` + `S`: Save the current annotations
 * `Esc`: Save the current annotations and exit
 * `Shift` + `Esc`: Discard the current annotations and exit
-

@@ -8,34 +8,40 @@ selectors please refer to `/usr/share/doc/nautilus-annotations/styling.md`.
 
 */
 
-dialog.nautilus-annotations-dialog,
-dialog.nautilus-annotations-dialog .titlebar {
+window.nautilus-annotations-dialog {
 	border: none;
 	background-image: none;
 	background-color: #fff394;
-	color: #ad5f00;
 }
 
-dialog.nautilus-annotations-dialog selection {
+window.nautilus-annotations-dialog .titlebar {
+	border: none;
+	background-image: none;
+	background-color: transparent;
+	color: #ad5f00;
+	box-shadow: none;
+}
+
+window.nautilus-annotations-dialog selection {
 	background-image: none;
 	background-color: #ad5f00;
 	color: #fff394;
 }
 
-dialog.nautilus-annotations-dialog text,
-dialog.nautilus-annotations-dialog button {
+window.nautilus-annotations-dialog text,
+window.nautilus-annotations-dialog button {
 	background-image: none;
 	background-color: transparent;
 	color: #ad5f00;
 }
 
-dialog.nautilus-annotations-dialog button.close {
+window.nautilus-annotations-dialog button.close {
 	color: #cc0000;
 	border: none;
 	box-shadow: none;
 }
 
-dialog.nautilus-annotations-dialog button.nautilus-annotations-discard {
+window.nautilus-annotations-dialog button.nautilus-annotations-discard {
 	padding: 0 6px;
 	background-color: #ad5f00;
 	color: #fff394;
@@ -46,4 +52,7 @@ dialog.nautilus-annotations-dialog button.nautilus-annotations-discard {
 textview.nautilus-annotations-view {
 	font-family: monospace;
 	padding: 0;
+	background-image: none;
+	background-color: transparent;
+	color: #ad5f00;
 }

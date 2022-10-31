@@ -8,46 +8,46 @@ selectors please refer to `/usr/share/doc/nautilus-annotations/styling.md`.
 
 */
 
-dialog.nautilus-annotations-dialog {
+window.nautilus-annotations-dialog {
 	border: none;
-	background-color: rgba(255, 255, 255, .95); 
-	background-image: 
-		linear-gradient(90deg, transparent 59px, #abced4 59px, #abced4 61px, transparent 61px, transparent calc(100% - 61px), #abced4 calc(100% - 61px), #abced4 calc(100% - 59px), transparent calc(100% - 59px)),
-		linear-gradient(#eee .1em, transparent .1em);
-	background-size: 100% 1.2em;
-	background-position: top left;
+	background-color: transparent; 
+	background-image: none;
 	color: #000;
 }
 
-dialog.nautilus-annotations-dialog .titlebar {
+window.nautilus-annotations-dialog .titlebar {
 	border: none;
 	background-color: rgba(255, 255, 255, .95);
 	background-image:
-		linear-gradient(90deg, transparent 59px, #abced4 59px, #abced4 61px, transparent 61px, transparent calc(100% - 61px), #abced4 calc(100% - 61px), #abced4 calc(100% - 59px), transparent calc(100% - 59px));
-	background-size: 100% 1.2em;
+		linear-gradient(to right, transparent 59px, #abced4 59px, #abced4 61px, transparent 61px),
+		linear-gradient(to left, transparent 59px, #abced4 59px, #abced4 61px, transparent 61px);
+	background-size: auto 1.2em;
+	background-position: left 0 top 0;
 	color: #000;
+	box-shadow: none;
+	margin: 0;
 }
 
-dialog.nautilus-annotations-dialog selection {
+window.nautilus-annotations-dialog selection {
 	background-image: none;
 	background-color: rgba(255, 255, 0, .2);
 	color: #000;
 }
 
-dialog.nautilus-annotations-dialog text,
-dialog.nautilus-annotations-dialog button {
+window.nautilus-annotations-dialog text,
+window.nautilus-annotations-dialog button {
 	background-image: none;
 	background-color: transparent;
 	color: #000;
 }
 
-dialog.nautilus-annotations-dialog button.close {
+window.nautilus-annotations-dialog button.close {
 	color: #000;
 	border: none;
 	box-shadow: none;
 }
 
-dialog.nautilus-annotations-dialog button.nautilus-annotations-discard {
+window.nautilus-annotations-dialog button.nautilus-annotations-discard {
 	padding: 1px 7px;
 	border: none;
 	background-image: none;
@@ -60,14 +60,26 @@ dialog.nautilus-annotations-dialog button.nautilus-annotations-discard {
 	margin-right: 25px;
 }
 
-dialog.nautilus-annotations-dialog button.nautilus-annotations-discard:hover {
+window.nautilus-annotations-dialog button.nautilus-annotations-discard:hover {
 	background-color: rgba(255, 255, 0, .4);
 	box-shadow: 0 0 2px 2px rgba(255, 255, 0, .4);
 	transition: background-color 1s 0s linear, box-shadow  1s 0s linear;
 }
 
+scrolledwindow.nautilus-annotations-scrollable {
+	background-color: rgba(255, 255, 255, .95); 
+	background-image:
+		linear-gradient(to right, transparent 59px, #abced4 59px, #abced4 61px, transparent 61px),
+		linear-gradient(to left, transparent 59px, #abced4 59px, #abced4 61px, transparent 61px),
+		linear-gradient(to bottom, #eee .1em, transparent .1em);
+	background-size: auto 1.2em;
+	background-position: left top;
+}
+
 textview.nautilus-annotations-view {
-	padding-left: 65px;
-	padding-right: 65px;
+	padding: .2em 65px 0 65px;
 	font-family: monospace;
+	line-height: 1.2em;
+	background-color: transparent; 
+	background-image: none;
 }

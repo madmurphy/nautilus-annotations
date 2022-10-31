@@ -23,15 +23,20 @@ running the `bootstrap` script. Use the `--noconfigure` parameter in order to
 prevent `bootstrap` from running automatically `configure` immediately after
 having generated it. To list different options use `bootstrap --help`.
 
+After installing this extension, do not forget to quit the `nautilus` process
+currently running with
+
+    nautilus -q
+
 
 Dependencies
 ------------
 
-This plugin depends on the following packages:
+This extension depends on the following packages:
 
 * glib2
-* gtksourceview4
-* libnautilus-extension
+* gtksourceview5
+* libnautilus-extension4
 
 Please make sure that they are present before compiling the source code.
 

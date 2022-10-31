@@ -9,7 +9,7 @@ dnl  **************************************************************************
 AC_PREREQ([2.69])
 
 AC_INIT([Nautilus Annotations],
-	[0.9.0],
+	[0.10.0],
 	[madmurphy333@gmail.com],
 	[nautilus-annotations],
 	[https://gitlab.gnome.org/madmurphy/nautilus-annotations])
@@ -40,7 +40,7 @@ AS_IF([test "x${HAVE_PKGCONFIG}" = xno],
 	[AC_MSG_ERROR([you need to have pkgconfig installed!])])
 
 PKG_CHECK_MODULES([NAUTILUS_ANNOTATIONS],
-	[glib-2.0 libnautilus-extension gtksourceview-4])
+	[glib-2.0 gtk4 gtksourceview-5 libnautilus-extension-4])
 
 AC_ARG_VAR([FIND], [Unix find utility])
 
@@ -108,18 +108,18 @@ dnl  **************************************************************************
 
 AC_ARG_WITH([nautilus-libdir],
 	[AS_HELP_STRING([--without-nautilus-libdir],
-		[ignore the <libdir> variable used by libnautilus-extension and
-		and use the current <libdir> instead @<:@default=no@:>@])],
+		[ignore the <libdir> variable used by libnautilus-extension-4
+		and and use the current <libdir> instead @<:@default=no@:>@])],
 	[:],
 	[AS_VAR_SET([with_nautilus_libdir], ['yes'])])
 
 AS_IF([test "x${with_nautilus_libdir}" = xno],
 	[AS_VAR_SET([NAUTILUS_EXTENSION_DIR], m4_normalize(["$(
 		"${PKG_CONFIG}" --define-variable='libdir=${libdir}'
-			--variable=extensiondir libnautilus-extension
+			--variable=extensiondir libnautilus-extension-4
 	)"]))],
 	[AS_VAR_SET([NAUTILUS_EXTENSION_DIR], m4_normalize(["$(
-		"${PKG_CONFIG}" --variable=extensiondir libnautilus-extension
+		"${PKG_CONFIG}" --variable=extensiondir libnautilus-extension-4
 	)"]))])
 
 AC_SUBST([NAUTILUS_EXTENSION_DIR])

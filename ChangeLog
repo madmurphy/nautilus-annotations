@@ -2,6 +2,15 @@ Change Log
 ==========
 
 
+## 0.10.0 (2022-10-31)
+
+Changes:
+
+* The extension has been ported to `libnautilus-extension-4`
+* Emblems have been updated
+* Code review
+
+
 ## 0.9.0 (2022-10-07)
 
 Changes:
