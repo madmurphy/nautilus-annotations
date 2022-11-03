@@ -287,7 +287,7 @@ static guint erase_annotations_in_files (
 
 
 static void v_erase_annotations_in_files (
-    const gpointer file_selection
+	const gpointer file_selection
 ) {
 
 	erase_annotations_in_files(file_selection);
@@ -462,7 +462,7 @@ static void on_annotation_dialog_response (
 	NautilusAnnotationsSession * const session
 ) {
 
-    UNUSED(dialog);
+	UNUSED(dialog);
 
 	switch (response_id) {
 
@@ -661,10 +661,9 @@ static void annotation_session_new_with_text (
 	}
 
 	#define a8n_title_wgt __tmpwidget1__
+	#define a8n_title_lbl __tmpwidget2__
 
 	a8n_title_wgt = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-
-	#define a8n_title_lbl __tmpwidget2__
 
 	a8n_title_lbl = gtk_label_new(header_title);
 
@@ -679,21 +678,23 @@ static void annotation_session_new_with_text (
 	#define a8n_subtitle_lbl __tmpwidget2__
 
 	a8n_subtitle_lbl = gtk_label_new(header_subtitle);
+
 	gtk_style_context_add_class(
 		gtk_widget_get_style_context(a8n_subtitle_lbl),
 		"subtitle"
 	);
+
 	gtk_box_append(GTK_BOX(a8n_title_wgt), a8n_subtitle_lbl);
 
 	#undef a8n_subtitle_lbl
-	#define a8n_header __tmpwidget2__
 
 	gtk_widget_set_valign(a8n_title_wgt, GTK_ALIGN_CENTER);
-	a8n_header = gtk_dialog_get_header_bar(GTK_DIALOG(a8n_dialog));
-	gtk_header_bar_set_title_widget(GTK_HEADER_BAR(a8n_header), a8n_title_wgt);
-	gtk_window_set_titlebar(GTK_WINDOW(a8n_dialog), a8n_header);
 
-	#undef a8n_header
+	gtk_header_bar_set_title_widget(
+		GTK_HEADER_BAR(gtk_dialog_get_header_bar(GTK_DIALOG(a8n_dialog))),
+		a8n_title_wgt
+	);
+
 	#undef a8n_title_wgt
 
 	g_free(tmpbuf);
@@ -800,7 +801,7 @@ static void annotation_session_new_with_text (
 
 
 static void annotation_session_preview_destroy (
-    const gpointer session_preview
+	const gpointer session_preview
 ) {
 
 	nautilus_file_info_list_free(
@@ -991,8 +992,8 @@ static GList * nautilus_annotations_get_file_items (
 
 	UNUSED(menu_provider);
 
-	GtkWindow *
-		nautilus_window = gtk_application_get_active_window(nautilus_app);
+	GtkWindow * nautilus_window =
+		gtk_application_get_active_window(nautilus_app);
 
 	#define NA_IS_FILE_SELECTION 1
 	#define NA_IS_DIRECTORY_SELECTION 2
