@@ -6,9 +6,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: nautilus-annotations 0.10.1\n"
+"Project-Id-Version: nautilus-annotations 0.10.2\n"
 "Report-Msgid-Bugs-To: madmurphy333@gmail.com\n"
-"POT-Creation-Date: 2021-05-22 14:39+0200\n"
+"POT-Creation-Date: 2022-11-12 07:06+0000\n"
 "PO-Revision-Date: 2021-05-22 14:39+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Italian <tp@lists.linux.it>\n"
@@ -23,8 +23,8 @@ msgid "Could not erase file's annotations"
 msgstr "Impossibile eliminare le annotazioni dal file"
 
 #: src/nautilus-annotations.c:270 src/nautilus-annotations.c:375
-#: src/nautilus-annotations.c:878
-msgid "unknown path"
+#: src/nautilus-annotations.c:877
+msgid "unknown location"
 msgstr "percorso sconosciuto"
 
 #: src/nautilus-annotations.c:374
@@ -51,7 +51,7 @@ msgstr "Annotazioni condivise"
 msgid "(multiple objects)"
 msgstr "(più oggetti)"
 
-#: src/nautilus-annotations.c:624 src/nautilus-annotations.c:1330
+#: src/nautilus-annotations.c:624 src/nautilus-annotations.c:1329
 msgid "Annotations"
 msgstr "Annotazioni"
 
@@ -59,106 +59,106 @@ msgstr "Annotazioni"
 msgid "Unknown path"
 msgstr "Percorso sconosciuto"
 
-#: src/nautilus-annotations.c:843
+#: src/nautilus-annotations.c:842
 msgid "No files were selected to be annotated"
 msgstr "Non ci sono file selezionati da annotare"
 
-#: src/nautilus-annotations.c:877
+#: src/nautilus-annotations.c:876
 msgid "Could not access file's annotations"
 msgstr "Impossibile accedere alle annotazioni del file"
 
-#: src/nautilus-annotations.c:919
+#: src/nautilus-annotations.c:918
 msgid "At least two annotations in the file selection differ"
 msgstr "Almeno due annotazioni nella selezione differiscono"
 
-#: src/nautilus-annotations.c:920
+#: src/nautilus-annotations.c:919
 msgid "This will set up a blank new annotation."
 msgstr "Questo comporterà l'apertura di un'annotazione vuota."
 
-#: src/nautilus-annotations.c:970
+#: src/nautilus-annotations.c:969
 msgid "No files were selected to be unannotated"
 msgstr "Non ci sono file selezionati da cui rimuovere annotazioni"
 
-#: src/nautilus-annotations.c:977
+#: src/nautilus-annotations.c:976
 msgid "Do you really want to erase the annotations attached?"
 msgstr "Si vogliono davvero rimuovere le annotazioni allegate?"
 
-#: src/nautilus-annotations.c:978
+#: src/nautilus-annotations.c:977
 msgid "The annotations will be lost forever."
 msgstr "Le annotazioni andranno perse per sempre."
 
-#: src/nautilus-annotations.c:979 src/nautilus-annotations.c:1132
+#: src/nautilus-annotations.c:978 src/nautilus-annotations.c:1131
 msgid "E_rase"
 msgstr "_Rimuovi"
 
-#: src/nautilus-annotations.c:1085
+#: src/nautilus-annotations.c:1084
 msgid "Directory's _annotations"
 msgid_plural "Directories' _annotations"
 msgstr[0] "_Annotazioni della cartella"
 msgstr[1] "_Annotazioni delle cartelle"
 
-#: src/nautilus-annotations.c:1092
+#: src/nautilus-annotations.c:1091
 msgid "File's _annotations"
 msgid_plural "Files' _annotations"
 msgstr[0] "_Annotazioni del file"
 msgstr[1] "_Annotazioni dei file"
 
-#: src/nautilus-annotations.c:1097
+#: src/nautilus-annotations.c:1096
 msgid "Objects' _annotations"
 msgstr "_Annotazioni degli oggetti"
 
-#: src/nautilus-annotations.c:1100
+#: src/nautilus-annotations.c:1099
 msgid "Choose an action for the object's annotations"
 msgid_plural "Choose an action for the objects' annotations"
 msgstr[0] "Scegli un'azione da compiere con le annotazioni dell'oggetto"
 msgstr[1] "Scegli un'azione da compiere con le annotazioni degli oggetti"
 
-#: src/nautilus-annotations.c:1112
+#: src/nautilus-annotations.c:1111
 msgid "_Edit and extend"
 msgstr "_Modifica ed estendi"
 
-#: src/nautilus-annotations.c:1114
+#: src/nautilus-annotations.c:1113
 msgid "_Edit"
 msgstr "_Modifica"
 
-#: src/nautilus-annotations.c:1116
+#: src/nautilus-annotations.c:1115
 msgid "Edit and extend the annotations attached to the selected objects"
 msgstr "Modifica ed estendi le annotazioni allegate agli oggetti selezionati"
 
-#: src/nautilus-annotations.c:1121
+#: src/nautilus-annotations.c:1120
 msgid "Edit the annotations attached to the selected object"
 msgid_plural "Edit the annotations attached to the selected objects"
 msgstr[0] "Modifica le annotazioni allegate all'oggetto selezionato"
 msgstr[1] "Modifica le annotazioni allegate agli oggetti selezionati"
 
-#: src/nautilus-annotations.c:1135
+#: src/nautilus-annotations.c:1134
 msgid "Remove the annotations attached to the selected object"
 msgid_plural "Remove the annotations attached to the selected objects"
 msgstr[0] "Rimuovi le annotazioni allegate all'oggetto selezionato"
 msgstr[1] "Rimuovi le annotazioni allegate agli oggetti selezionati"
 
-#: src/nautilus-annotations.c:1165
+#: src/nautilus-annotations.c:1164
 msgid "_Annotate directory"
 msgid_plural "_Annotate directories"
 msgstr[0] "_Annota la cartella"
 msgstr[1] "_Annota le cartelle"
 
-#: src/nautilus-annotations.c:1172
+#: src/nautilus-annotations.c:1171
 msgid "_Annotate file"
 msgid_plural "_Annotate files"
 msgstr[0] "_Annota il file"
 msgstr[1] "_Annota i file"
 
-#: src/nautilus-annotations.c:1177
+#: src/nautilus-annotations.c:1176
 msgid "_Annotate objects"
 msgstr "_Annota gli oggetti"
 
-#: src/nautilus-annotations.c:1180
+#: src/nautilus-annotations.c:1179
 msgid "Attach an annotation to the selected object"
 msgid_plural "Attach an annotation to the selected objects"
 msgstr[0] "Allega un'annotazione all'oggetto selezionato"
 msgstr[1] "Allega un'annotazione agli oggetti selezionati"
 
-#: src/nautilus-annotations.c:1331
+#: src/nautilus-annotations.c:1330
 msgid "Annotations attached to the object"
 msgstr "Annotazioni allegate all'oggetto"

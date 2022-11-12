@@ -48,6 +48,7 @@ window.nautilus-annotations-dialog button.close {
 }
 
 window.nautilus-annotations-dialog button.nautilus-annotations-discard {
+	margin-right: 25px;
 	padding: 1px 7px;
 	border: none;
 	background-image: none;
@@ -56,8 +57,8 @@ window.nautilus-annotations-dialog button.nautilus-annotations-discard {
 	color: #000;
 	font-family: monospace;
 	font-size: .85em;
+	font-weight: normal;
 	transition: background-color .3s 0s linear, box-shadow  .3s 0s linear;
-	margin-right: 25px;
 }
 
 window.nautilus-annotations-dialog button.nautilus-annotations-discard:hover {

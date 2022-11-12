@@ -43,10 +43,11 @@ window.nautilus-annotations-dialog button.close {
 
 window.nautilus-annotations-dialog button.nautilus-annotations-discard {
 	padding: 1px 7px;
-	border: none;
 	background-color: rgba(255, 255, 255, .2);
 	box-shadow: 0 0 1px 2px rgba(255, 255, 255, .2);
 	color: #fff;
+	font-weight: normal;
+	border: none;
 	transition: background-color .3s 0s linear, box-shadow  .3s 0s linear;
 }
 

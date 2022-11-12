@@ -13,7 +13,7 @@ cp /usr/share/doc/nautilus-annotations/css-factory/[THEME-NAME]-theme.css \
 nautilus -q
 ```
 
-To set a theme system-wide two options are available:
+To set a system-wide theme two options are available:
 
 1. Pass a `--with-theme=[THEME-NAME]` option to the `configure` script during
    the build process

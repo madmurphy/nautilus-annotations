@@ -267,7 +267,7 @@ static guint erase_annotations_in_files (
 			g_message(
 				"%s (%s) // %s",
 				_("Could not erase file's annotations"),
-				uri ? uri : _("unknown path"),
+				uri ? uri : _("unknown location"),
 				eraserr->message
 			);
 
@@ -372,7 +372,7 @@ static guint annotation_session_export (
 			g_message(
 				"%s (%s) // %s",
 				_("Could not save file's annotations"),
-				uri ? uri : _("unknown path"),
+				uri ? uri : _("unknown location"),
 				saverr->message
 			);
 
@@ -664,7 +664,6 @@ static void annotation_session_new_with_text (
 	#define a8n_title_lbl __tmpwidget2__
 
 	a8n_title_wgt = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
-
 	a8n_title_lbl = gtk_label_new(header_title);
 
 	gtk_style_context_add_class(
@@ -875,7 +874,7 @@ static void on_annotate_menuitem_activate (
 			g_message(
 				"%s (%s) // %s",
 				_("Could not access file's annotations"),
-				uri ? uri : _("unknown path"),
+				uri ? uri : _("unknown location"),
 				loaderr->message
 			);
 

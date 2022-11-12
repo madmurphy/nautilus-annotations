@@ -45,6 +45,7 @@ window.nautilus-annotations-dialog button.nautilus-annotations-discard {
 	padding: 0 6px;
 	background-color: #ad5f00;
 	color: #fff394;
+	font-weight: normal;
 	border: none;
 	box-shadow: 0 0 2px 2px #ad5f00;
 }

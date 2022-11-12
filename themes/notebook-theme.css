@@ -47,13 +47,14 @@ window.nautilus-annotations-dialog button.close {
 
 window.nautilus-annotations-dialog button.nautilus-annotations-discard {
 	padding: 1px 7px;
-	border: none;
 	background-image: none;
 	background-color: rgba(255, 255, 0, .2);
-	box-shadow: 0 0 2px 2px rgba(255, 255, 0, .2);
 	color: #000;
 	font-family: monospace;
 	font-size: .85em;
+	font-weight: normal;
+	border: none;
+	box-shadow: 0 0 2px 2px rgba(255, 255, 0, .2);
 	transition: background-color .3s 0s linear, box-shadow  .3s 0s linear;
 }
 

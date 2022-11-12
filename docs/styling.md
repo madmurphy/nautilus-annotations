@@ -49,7 +49,9 @@ GTK_DEBUG=interactive nautilus
 ```
 
 For example, by pasting the following style sheet into **GtkInspector**'s “CSS”
-tab, the annotations will be styled as yellow sticky notes:
+tab, the annotations will be styled as yellow sticky notes (please use an
+unthemed installation for experimenting with CSS, via
+`./configure --without-theme`):
 
 ``` css
 window.nautilus-annotations-dialog {
@@ -89,6 +91,7 @@ window.nautilus-annotations-dialog button.nautilus-annotations-discard {
 	padding: 0 6px;
 	background-color: #ad5f00;
 	color: #fff394;
+	font-weight: normal;
 	border: none;
 	box-shadow: 0 0 2px 2px #ad5f00;
 }

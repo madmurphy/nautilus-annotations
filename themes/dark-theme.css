@@ -43,9 +43,10 @@ window.nautilus-annotations-dialog button.close {
 
 window.nautilus-annotations-dialog button.nautilus-annotations-discard {
 	padding: 1px 7px;
-	border: none;
 	background-color: #ddd;
 	color: #2e3436;
+	font-weight: normal;
+	border: none;
 	transition: background-color .3s 0s linear;
 }
 
