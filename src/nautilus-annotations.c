@@ -67,9 +67,6 @@
 \*/
 
 
-#define UNUSED(ARG) (void)(ARG)
-
-
 typedef struct NautilusAnnotations {
 	GObject parent_slot;
 } NautilusAnnotations;
@@ -84,14 +81,14 @@ typedef struct NautilusAnnotationsSession {
 	GtkDialog * annotation_dialog;
 	GtkSourceBuffer * annotation_text;
 	GtkButton * discard_button;
-	GList * targets;
+	const GList * targets;
 } NautilusAnnotationsSession;
 
 
-typedef struct NautilusAnnotationsSessionPreview {
+typedef struct NautilusAnnotationsPreview {
 	GtkWindow * parent;
-	GList * targets;
-} NautilusAnnotationsSessionPreview;
+	const GList * targets;
+} NautilusAnnotationsPreview;
 
 
 typedef struct NautilusAnnotationsDestroyFork {
@@ -171,7 +168,7 @@ static void destructive_action_confirm (
 	const gpointer ifelse_data
 ) {
 
-	NautilusAnnotationsDestroyFork * ifelse_fork =
+	NautilusAnnotationsDestroyFork * const ifelse_fork =
 		g_new(NautilusAnnotationsDestroyFork, 1);
 
 	GtkDialog * const question_dialog =
@@ -211,14 +208,10 @@ static void destructive_action_confirm (
 			);
 
 	gtk_dialog_set_default_response(question_dialog, GTK_RESPONSE_OK);
-
-	gtk_style_context_add_class(
-		gtk_widget_get_style_context(destructive_button),
-		"destructive-action"
-	);
+	gtk_widget_add_css_class(destructive_button, "destructive-action");
 
 	g_signal_connect(
-		G_OBJECT(question_dialog),
+		question_dialog,
 		"response",
 		G_CALLBACK(on_destructive_action_response),
 		ifelse_fork
@@ -230,7 +223,7 @@ static void destructive_action_confirm (
 
 
 static guint erase_annotations_in_files (
-	GList * const file_selection
+	const GList * const file_selection
 ) {
 
 	GFile * location;
@@ -238,7 +231,7 @@ static guint erase_annotations_in_files (
 	guint noncleared = 0;
 	gchar * uri;
 
-	for (GList * iter = file_selection; iter; iter = iter->next) {
+	for (const GList * iter = file_selection; iter; iter = iter->next) {
 
 		location = nautilus_file_info_get_location(
 			NAUTILUS_FILE_INFO(iter->data)
@@ -304,7 +297,7 @@ static void annotation_session_destroy (
 	);
 
 	nautilus_file_info_list_free(
-		((NautilusAnnotationsSession *) session)->targets
+		(GList *) ((NautilusAnnotationsSession *) session)->targets
 	);
 
 	g_free(session);
@@ -313,11 +306,10 @@ static void annotation_session_destroy (
 
 
 static guint annotation_session_export (
-	NautilusAnnotationsSession * const session
+	const NautilusAnnotationsSession * const session
 ) {
 
 	GtkTextIter text_start, text_end;
-	gchar * text_content;
 
 	gtk_text_buffer_get_bounds(
 		GTK_TEXT_BUFFER(session->annotation_text),
@@ -325,7 +317,7 @@ static guint annotation_session_export (
 		&text_end
 	);
 
-	text_content = gtk_text_buffer_get_text(
+	gchar * const text_content = gtk_text_buffer_get_text(
 		GTK_TEXT_BUFFER(session->annotation_text),
 		&text_start,
 		&text_end,
@@ -344,7 +336,7 @@ static guint annotation_session_export (
 	GError * saverr = NULL;
 	gchar * uri;
 
-	for (GList * iter = session->targets; iter; iter = iter->next) {
+	for (const GList * iter = session->targets; iter; iter = iter->next) {
 
 		location = nautilus_file_info_get_location(
 			NAUTILUS_FILE_INFO(iter->data)
@@ -393,7 +385,7 @@ static guint annotation_session_export (
 
 
 static void annotation_session_save (
-	NautilusAnnotationsSession * const session
+	const NautilusAnnotationsSession * const session
 ) {
 
 	if (!annotation_session_export(session)) {
@@ -457,12 +449,10 @@ static void annotation_session_query_discard (
 
 
 static void on_annotation_dialog_response (
-	GtkDialog * const dialog,
+	GtkDialog * const dialog G_GNUC_UNUSED,
 	gint const response_id,
 	NautilusAnnotationsSession * const session
 ) {
-
-	UNUSED(dialog);
 
 	switch (response_id) {
 
@@ -482,7 +472,7 @@ static void on_annotation_dialog_response (
 
 static void on_text_modified_state_change (
 	GtkSourceBuffer * const annotation_text,
-	NautilusAnnotationsSession * const session
+	const NautilusAnnotationsSession * const session
 ) {
 
 	gtk_widget_set_visible(
@@ -494,26 +484,22 @@ static void on_text_modified_state_change (
 
 
 static void on_save_action_activate (
-	GSimpleAction * const action,
-	GVariant * const parameter,
+	GSimpleAction * const action G_GNUC_UNUSED,
+	GVariant * const parameter G_GNUC_UNUSED,
 	const gpointer session
 ) {
 
-	UNUSED(action);
-	UNUSED(parameter);
 	annotation_session_save((NautilusAnnotationsSession *) session);
 
 }
 
 
 static void on_discard_action_activate (
-	GSimpleAction * const action,
-	GVariant * const parameter,
+	GSimpleAction * const action G_GNUC_UNUSED,
+	GVariant * const parameter G_GNUC_UNUSED,
 	const gpointer session
 ) {
 
-	UNUSED(action);
-	UNUSED(parameter);
 	annotation_session_query_discard((NautilusAnnotationsSession *) session);
 
 }
@@ -521,7 +507,7 @@ static void on_discard_action_activate (
 
 static void annotation_session_new_with_text (
 	GtkWindow * const parent,
-	GList * const target_files,
+	const GList * const target_files,
 	/*  nullable  */  const gchar * const initial_text
 ) {
 
@@ -551,9 +537,9 @@ static void annotation_session_new_with_text (
 	GdkRectangle workarea = { 0 };
 	const gchar * header_title;
 	gchar * header_subtitle, * tmpbuf = NULL;
-	GSimpleActionGroup * a8n_action_map = g_simple_action_group_new();
-	GtkEventController * a8n_controller = gtk_shortcut_controller_new();
-	GtkWidget * __tmpwidget1__, * __tmpwidget2__;
+	GSimpleActionGroup * const a8n_action_map = g_simple_action_group_new();
+	GtkEventController * const a8n_controller = gtk_shortcut_controller_new();
+	GtkWidget * _placeholder_1_, * _placeholder_2_;
 
 	session->annotation_dialog = a8n_dialog;
 	session->targets = target_files;
@@ -598,13 +584,13 @@ static void annotation_session_new_with_text (
 
 	}
 
-	gtk_style_context_add_class(
-		gtk_widget_get_style_context(GTK_WIDGET(a8n_dialog)),
+	gtk_widget_add_css_class(
+		GTK_WIDGET(a8n_dialog),
 		"nautilus-annotations-dialog"
 	);
 
-	gtk_style_context_add_class(
-		gtk_widget_get_style_context(GTK_WIDGET(session->discard_button)),
+	gtk_widget_add_css_class(
+		GTK_WIDGET(session->discard_button),
 		"nautilus-annotations-discard"
 	);
 
@@ -615,7 +601,7 @@ static void annotation_session_new_with_text (
 
 	} else {
 
-		GFile * location = nautilus_file_info_get_location(
+		GFile * const location = nautilus_file_info_get_location(
 			NAUTILUS_FILE_INFO(session->targets->data)
 		);
 
@@ -660,29 +646,19 @@ static void annotation_session_new_with_text (
 
 	}
 
-	#define a8n_title_wgt __tmpwidget1__
-	#define a8n_title_lbl __tmpwidget2__
+	#define a8n_title_wgt _placeholder_1_
+	#define a8n_title_lbl _placeholder_2_
 
 	a8n_title_wgt = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 	a8n_title_lbl = gtk_label_new(header_title);
-
-	gtk_style_context_add_class(
-		gtk_widget_get_style_context(a8n_title_lbl),
-		"title"
-	);
-
+	gtk_widget_add_css_class(a8n_title_lbl, "title");
 	gtk_box_append(GTK_BOX(a8n_title_wgt), a8n_title_lbl);
 
 	#undef a8n_title_lbl
-	#define a8n_subtitle_lbl __tmpwidget2__
+	#define a8n_subtitle_lbl _placeholder_2_
 
 	a8n_subtitle_lbl = gtk_label_new(header_subtitle);
-
-	gtk_style_context_add_class(
-		gtk_widget_get_style_context(a8n_subtitle_lbl),
-		"subtitle"
-	);
-
+	gtk_widget_add_css_class(a8n_subtitle_lbl, "subtitle");
 	gtk_box_append(GTK_BOX(a8n_title_wgt), a8n_subtitle_lbl);
 
 	#undef a8n_subtitle_lbl
@@ -712,32 +688,17 @@ static void annotation_session_new_with_text (
 		workarea.height ? workarea.height * 2 / 3 : A8N_WIN_FALLBACK_HEIGHT
 	);
 
-	#define scrollable __tmpwidget1__
-	#define text_area __tmpwidget2__
+	#define scrollable _placeholder_1_
+	#define text_area _placeholder_2_
 
 	scrollable = gtk_scrolled_window_new();
-	text_area = gtk_source_view_new_with_buffer(
-		session->annotation_text
-	);
-
-	gtk_style_context_add_class(
-		gtk_widget_get_style_context(text_area),
-		"nautilus-annotations-view"
-	);
-
-	gtk_style_context_add_class(
-		gtk_widget_get_style_context(scrollable),
-		"nautilus-annotations-scrollable"
-	);
-
+	text_area = gtk_source_view_new_with_buffer(session->annotation_text);
+	gtk_widget_add_css_class(text_area, "nautilus-annotations-view");
+	gtk_widget_add_css_class(scrollable, "nautilus-annotations-scrollable");
 	gtk_widget_set_vexpand(text_area, true);
 	gtk_widget_set_hexpand(text_area, true);
 	gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(text_area), GTK_WRAP_WORD);
-
-	gtk_scrolled_window_set_child(
-		GTK_SCROLLED_WINDOW(scrollable),
-		text_area
-	);
+	gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scrollable), text_area);
 
 	gtk_box_append(
 		GTK_BOX(gtk_dialog_get_content_area(a8n_dialog)),
@@ -748,14 +709,14 @@ static void annotation_session_new_with_text (
 	#undef text_area
 
 	g_signal_connect(
-		G_OBJECT(a8n_dialog),
+		a8n_dialog,
 		"response",
 		G_CALLBACK(on_annotation_dialog_response),
 		session
 	);
 
 	g_signal_connect(
-		G_OBJECT(session->annotation_text),
+		session->annotation_text,
 		"modified-changed",
 		G_CALLBACK(on_text_modified_state_change),
 		session
@@ -804,7 +765,7 @@ static void annotation_session_preview_destroy (
 ) {
 
 	nautilus_file_info_list_free(
-		((NautilusAnnotationsSessionPreview *) session_preview)->targets
+		(GList *) ((NautilusAnnotationsPreview *) session_preview)->targets
 	);
 
 	g_free(session_preview);
@@ -817,8 +778,8 @@ static void annotation_session_preview_ignite_and_destroy (
 ) {
 
 	annotation_session_new_with_text(
-		((NautilusAnnotationsSessionPreview *) session_preview)->parent,
-		((NautilusAnnotationsSessionPreview *) session_preview)->targets,
+		((NautilusAnnotationsPreview *) session_preview)->parent,
+		((NautilusAnnotationsPreview *) session_preview)->targets,
 		NULL
 	);
 
@@ -851,7 +812,7 @@ static void on_annotate_menuitem_activate (
 	GError * loaderr = NULL;
 	gchar * uri;
 
-	for (GList * iter = file_selection; iter; iter = iter->next) {
+	for (const GList * iter = file_selection; iter; iter = iter->next) {
 
 		location = nautilus_file_info_get_location(
 			NAUTILUS_FILE_INFO(iter->data)
@@ -904,11 +865,8 @@ static void on_annotate_menuitem_activate (
 
 		if (strcmp(a8n_probe, current_annotation)) {
 
-			g_object_unref(finfo);
-			g_free(current_annotation);
-
-			NautilusAnnotationsSessionPreview * preview =
-				g_new(NautilusAnnotationsSessionPreview, 1);
+			NautilusAnnotationsPreview * preview =
+				g_new(NautilusAnnotationsPreview, 1);
 
 			preview->parent = nautilus_window;
 			preview->targets = nautilus_file_info_list_copy(file_selection);
@@ -923,7 +881,8 @@ static void on_annotate_menuitem_activate (
 				preview
 			);
 
-			return;
+			g_object_unref(finfo);
+			goto free_and_exit;
 
 		}
 
@@ -959,7 +918,7 @@ static void on_unannotate_menuitem_activate (
 	GtkWindow * const nautilus_window
 ) {
 
-	GList * const file_selection = g_object_get_data(
+	const GList * const file_selection = g_object_get_data(
 		G_OBJECT(menu_item),
 		"nautilus_annotations_files"
 	);
@@ -978,18 +937,16 @@ static void on_unannotate_menuitem_activate (
 		_("E_rase"),
 		v_erase_annotations_in_files,
 		NULL,
-		file_selection
+		(gpointer) file_selection
 	);
 
 }
 
 
 static GList * nautilus_annotations_get_file_items (
-	NautilusMenuProvider * const menu_provider,
+	NautilusMenuProvider * const menu_provider G_GNUC_UNUSED,
 	GList * const file_selection
 ) {
-
-	UNUSED(menu_provider);
 
 	GtkWindow * nautilus_window =
 		gtk_application_get_active_window(nautilus_app);
@@ -1009,7 +966,7 @@ static GList * nautilus_annotations_get_file_items (
 
 	guint8 selection_type = 0, selection_flags = 0;
 	gsize sellen = 0;
-	GList * iter;
+	const GList * iter;
 	GFile * location;
 	GFileInfo * finfo;
 
@@ -1077,7 +1034,9 @@ static GList * nautilus_annotations_get_file_items (
 		NautilusMenuItem * subitem_iter;
 
 		item_annotations = nautilus_menu_item_new(
+			/*  Name  */
 			"NautilusAnnotations::choose",
+			/*  Label  */
 			selection_type == NA_IS_DIRECTORY_SELECTION ?
 				g_dngettext(
 					GETTEXT_PACKAGE,
@@ -1094,26 +1053,33 @@ static GList * nautilus_annotations_get_file_items (
 				)
 			:
 				_("Objects' _annotations"),
+			/*  Tip  */
 			g_dngettext(
 				GETTEXT_PACKAGE,
 				"Choose an action for the object's annotations",
 				"Choose an action for the objects' annotations",
 				sellen
 			),
+			/*  Icon  */
 			NULL
 		);
 
 		nautilus_menu_item_set_submenu(item_annotations, menu_annotations);
 
 		item_annotate = nautilus_menu_item_new(
+			/*  Name  */
 			"NautilusAnnotations::annotate",
+			/*  Label  */
 			selection_flags & NA_HAVE_UNANNOTATED ?
 				_("_Edit and extend")
 			:
 				_("_Edit"),
+			/*  Tip  */
 			selection_flags & NA_HAVE_UNANNOTATED ?
-				_("Edit and extend the annotations attached to the selected"
-					" objects")
+				_(
+					"Edit and extend the annotations attached to the selected"
+					" objects"
+				)
 			:
 				g_dngettext(
 					GETTEXT_PACKAGE,
@@ -1121,6 +1087,7 @@ static GList * nautilus_annotations_get_file_items (
 					"Edit the annotations attached to the selected objects",
 					sellen
 				),
+			/*  Icon  */
 			"annotate"
 		);
 
@@ -1139,7 +1106,7 @@ static GList * nautilus_annotations_get_file_items (
 		);
 
 		g_signal_connect(
-			G_OBJECT(subitem_iter),
+			subitem_iter,
 			"activate",
 			G_CALLBACK(on_unannotate_menuitem_activate),
 			nautilus_window
@@ -1157,7 +1124,9 @@ static GList * nautilus_annotations_get_file_items (
 	} else {
 
 		item_annotations = item_annotate = nautilus_menu_item_new(
+			/*  Name  */
 			"NautilusAnnotations::annotate",
+			/*  Label  */
 			selection_type == NA_IS_DIRECTORY_SELECTION ?
 				g_dngettext(
 					GETTEXT_PACKAGE,
@@ -1174,19 +1143,21 @@ static GList * nautilus_annotations_get_file_items (
 				)
 			:
 				_("_Annotate objects"),
+			/*  Tip  */
 			g_dngettext(
 				GETTEXT_PACKAGE,
 				"Attach an annotation to the selected object",
 				"Attach an annotation to the selected objects",
 				sellen
 			),
+			/*  Icon  */
 			"annotate"
 		);
 
 	}
 
 	g_signal_connect(
-		G_OBJECT(item_annotate),
+		item_annotate,
 		"activate",
 		G_CALLBACK(on_annotate_menuitem_activate),
 		nautilus_window
@@ -1229,17 +1200,13 @@ static GList * nautilus_annotations_get_background_items (
 
 
 static NautilusOperationResult nautilus_annotations_update_file_info (
-	NautilusInfoProvider * const info_provider,
+	NautilusInfoProvider * const info_provider G_GNUC_UNUSED,
 	NautilusFileInfo * const nautilus_file,
-	GClosure * const update_complete,
-	NautilusOperationHandle ** const handle
+	GClosure * const update_complete G_GNUC_UNUSED,
+	NautilusOperationHandle ** const handle G_GNUC_UNUSED
 ) {
 
-	UNUSED(info_provider);
-	UNUSED(update_complete);
-	UNUSED(handle);
-
-	GFile * location = nautilus_file_info_get_location(nautilus_file);
+	GFile * const location = nautilus_file_info_get_location(nautilus_file);
 
 	GFileInfo * const finfo = g_file_query_info(
 		location,
@@ -1257,7 +1224,7 @@ static NautilusOperationResult nautilus_annotations_update_file_info (
 
 	}
 
-	const gchar * a8n_probe = g_file_info_get_attribute_string(
+	const gchar * const a8n_probe = g_file_info_get_attribute_string(
 		finfo,
 		G_FILE_ATTRIBUTE_METADATA_ANNOTATION
 	);
@@ -1316,10 +1283,8 @@ static NautilusOperationResult nautilus_annotations_update_file_info (
 
 
 static GList * nautilus_annotations_get_columns (
-	NautilusColumnProvider * const column_provider
+	NautilusColumnProvider * const column_provider G_GNUC_UNUSED
 ) {
-
-	UNUSED(column_provider);
 
 	return g_list_append(
 		NULL, 
@@ -1336,10 +1301,9 @@ static GList * nautilus_annotations_get_columns (
 
 static void nautilus_annotations_type_info_provider_iface_init (
 	NautilusInfoProviderInterface * const iface,
-	const gpointer iface_data
+	const gpointer iface_data G_GNUC_UNUSED
 ) {
 
-	UNUSED(iface_data);
 	iface->update_file_info = nautilus_annotations_update_file_info;
 
 }
@@ -1347,10 +1311,9 @@ static void nautilus_annotations_type_info_provider_iface_init (
 
 static void nautilus_annotations_menu_provider_iface_init (
 	NautilusMenuProviderInterface * const iface,
-	const gpointer iface_data
+	const gpointer iface_data G_GNUC_UNUSED
 ) {
 
-	UNUSED(iface_data);
 	iface->get_file_items = nautilus_annotations_get_file_items;
 	iface->get_background_items = nautilus_annotations_get_background_items;
 
@@ -1359,10 +1322,9 @@ static void nautilus_annotations_menu_provider_iface_init (
 
 static void nautilus_annotations_column_provider_iface_init (
 	NautilusColumnProviderInterface * const iface,
-	const gpointer iface_data
+	const gpointer iface_data G_GNUC_UNUSED
 ) {
 
-	UNUSED(iface_data);
 	iface->get_columns = nautilus_annotations_get_columns;
 
 }
@@ -1370,10 +1332,9 @@ static void nautilus_annotations_column_provider_iface_init (
 
 static void nautilus_annotations_class_init (
 	NautilusAnnotationsClass * const nautilus_annotations_class,
-	const gpointer class_data
+	const gpointer class_data G_GNUC_UNUSED
 ) {
 
-	UNUSED(class_data);
 	parent_class = g_type_class_peek_parent(nautilus_annotations_class);
 
 }
@@ -1502,7 +1463,7 @@ void nautilus_module_initialize (
 		NULL
 	);
 
-	GFileInfo * finfo = g_file_query_info(
+	GFileInfo * const finfo = g_file_query_info(
 		css_file,
 		G_FILE_ATTRIBUTE_ACCESS_CAN_READ,
 		G_FILE_QUERY_INFO_NONE,

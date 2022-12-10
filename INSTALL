@@ -35,6 +35,7 @@ Dependencies
 This extension depends on the following packages:
 
 * glib2
+* gtk4
 * gtksourceview5
 * libnautilus-extension4
 

@@ -2,6 +2,15 @@ Change Log
 ==========
 
 
+## 1.0.0 (2022-12-10)
+
+Changes:
+
+* The extension can be considered stable enough; the version string has been
+  updated to 1.0.0
+* Code review
+
+
 ## 0.10.2 (2022-11-12)
 
 Changes:
