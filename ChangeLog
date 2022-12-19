@@ -2,6 +2,16 @@ Change Log
 ==========
 
 
+## 2.0.0 (2022-12-19)
+
+Changes:
+
+* The annotation window has got an emblem picker!
+* The path displayed in the window title is now ellipsized when longer than 99
+  characters
+* Code review
+
+
 ## 1.0.0 (2022-12-10)
 
 Changes:

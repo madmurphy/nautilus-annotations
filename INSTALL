@@ -37,6 +37,7 @@ This extension depends on the following packages:
 * glib2
 * gtk4
 * gtksourceview5
+* libadwaita1
 * libnautilus-extension4
 
 Please make sure that they are present before compiling the source code.

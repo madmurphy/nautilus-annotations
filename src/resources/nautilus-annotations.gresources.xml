@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+	<gresource prefix="/org/gnome/nautilus/annotations">
+		<file>style.css</file>
+		<file>emblem-picker/style.css</file>
+		<file>icons/scalable/actions/gnuisance.nav-next.svg</file>
+		<file>icons/scalable/actions/gnuisance.nav-previous.svg</file>
+		<file>icons/scalable/actions/gnuisance.warning.svg</file>
+		<file>icons/scalable/actions/nautilus-annotations-tag-new.svg</file>
+		<file>icons/16x16/actions/gnuisance.nav-next.png</file>
+		<file>icons/16x16/actions/gnuisance.nav-previous.png</file>
+		<file>icons/16x16/actions/gnuisance.warning.png</file>
+		<file>icons/16x16/actions/nautilus-annotations-tag-new.png</file>
+		<file>icons/24x24/actions/gnuisance.nav-next.png</file>
+		<file>icons/24x24/actions/gnuisance.nav-previous.png</file>
+		<file>icons/24x24/actions/gnuisance.warning.png</file>
+		<file>icons/24x24/actions/nautilus-annotations-tag-new.png</file>
+		<file>icons/32x32/actions/gnuisance.nav-next.png</file>
+		<file>icons/32x32/actions/gnuisance.nav-previous.png</file>
+		<file>icons/32x32/actions/gnuisance.warning.png</file>
+		<file>icons/32x32/actions/nautilus-annotations-tag-new.png</file>
+		<file>icons/48x48/actions/gnuisance.nav-next.png</file>
+		<file>icons/48x48/actions/gnuisance.nav-previous.png</file>
+		<file>icons/48x48/actions/gnuisance.warning.png</file>
+		<file>icons/48x48/actions/nautilus-annotations-tag-new.png</file>
+		<file>icons/64x64/actions/gnuisance.nav-next.png</file>
+		<file>icons/64x64/actions/gnuisance.nav-previous.png</file>
+		<file>icons/64x64/actions/gnuisance.warning.png</file>
+		<file>icons/64x64/actions/nautilus-annotations-tag-new.png</file>
+		<file>icons/8x8/actions/gnuisance.nav-next.png</file>
+		<file>icons/8x8/actions/gnuisance.nav-previous.png</file>
+		<file>icons/8x8/actions/gnuisance.warning.png</file>
+		<file>icons/8x8/actions/nautilus-annotations-tag-new.png</file>
+		<file>icons/96x96/actions/gnuisance.nav-next.png</file>
+		<file>icons/96x96/actions/gnuisance.nav-previous.png</file>
+		<file>icons/96x96/actions/gnuisance.warning.png</file>
+		<file>icons/96x96/actions/nautilus-annotations-tag-new.png</file>
+	</gresource>
+</gresources>

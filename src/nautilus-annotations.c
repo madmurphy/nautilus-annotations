@@ -37,6 +37,7 @@
 #include <gtk/gtk.h>
 #include <gtksourceview/gtksource.h>
 #include <nautilus-extension.h>
+#include "emblem-picker/gnui-emblem-picker.h"
 
 
 
@@ -78,9 +79,11 @@ typedef struct NautilusAnnotationsClass {
 
 
 typedef struct NautilusAnnotationsSession {
-	GtkDialog * annotation_dialog;
+	GtkWindow * annotation_window;
 	GtkSourceBuffer * annotation_text;
 	GtkButton * discard_button;
+	GtkRevealer * emblem_menu;
+	GnuiEmblemPicker * emblem_picker;
 	const GList * targets;
 } NautilusAnnotationsSession;
 
@@ -98,11 +101,25 @@ typedef struct NautilusAnnotationsDestroyFork {
 } NautilusAnnotationsDestroyFork;
 
 
+static const char * const a8n_picker_forbidden_emblems[] = {
+	"emblem-annotations",
+	"emblem-annotations-symbolic", NULL
+};
+
+
+static const char * const a8n_resource_icon_paths[] = {
+	"/org/gnome/nautilus/annotations/icons",
+	NULL
+};
+
+
 static GType provider_types[1];
 static GType nautilus_annotations_type;
 static GObjectClass * parent_class;
 static GtkApplication * nautilus_app;
-static GtkCssProvider * annotations_css;
+static GtkCssProvider * a8n_fallback_css;
+static GtkCssProvider * a8n_theme_css;
+static GtkCssProvider * emblem_picker_css;
 
 
 /*  This metadata key was originally used by Nautilus  */
@@ -116,8 +133,9 @@ static GtkCssProvider * annotations_css;
 #define A8N_WIN_FALLBACK_HEIGHT 400
 
 
-/*  This constant is measured in number of unicode characters  */
+/*  These constants are measured in number of unicode characters  */
 #define A8N_COLUMN_MAX_LENGTH 99
+#define A8N_WINDOW_SUBTITLE_MAX_LENGTH 99
 
 
 /*  Prefixes to tildize (to be provided by the build system in the future?)  */
@@ -257,7 +275,7 @@ static guint erase_annotations_in_files (
 
 			uri = nautilus_file_info_get_uri(NAUTILUS_FILE_INFO(iter->data));
 
-			g_message(
+			g_warning(
 				"%s (%s) // %s",
 				_("Could not erase file's annotations"),
 				uri ? uri : _("unknown location"),
@@ -293,7 +311,7 @@ static void annotation_session_destroy (
 ) {
 
 	gtk_window_destroy(
-		GTK_WINDOW(((NautilusAnnotationsSession *) session)->annotation_dialog)
+		GTK_WINDOW(((NautilusAnnotationsSession *) session)->annotation_window)
 	);
 
 	nautilus_file_info_list_free(
@@ -361,7 +379,7 @@ static guint annotation_session_export (
 
 			uri = nautilus_file_info_get_uri(NAUTILUS_FILE_INFO(iter->data));
 
-			g_message(
+			g_warning(
 				"%s (%s) // %s",
 				_("Could not save file's annotations"),
 				uri ? uri : _("unknown location"),
@@ -384,6 +402,78 @@ static guint annotation_session_export (
 }
 
 
+static gboolean report_emblems_for_file (
+	GFile * const location,
+	const gchar * const * const added_emblems,
+	const gchar * const * const removed_emblems G_GNUC_UNUSED,
+	const GnuiEmblemPickerSaveResult result,
+	const GError * const saverr,
+	const gpointer user_data G_GNUC_UNUSED
+) {
+
+	NautilusFileInfo * nautilus_file;
+	gchar * uri;
+	const gchar * const * strptr;
+
+	switch (result) {
+
+		case GNUI_EMBLEM_PICKER_ERROR:
+
+			uri = g_file_get_uri(location);
+
+			g_warning(
+				"%s (%s) // %s",
+				_("Could not save file's emblems"),
+				uri ? uri : _("unknown location"),
+				saverr ? saverr->message : _("Unknown error")
+			);
+
+			g_free(uri);
+			return true;
+
+		case GNUI_EMBLEM_PICKER_SUCCESS:
+
+			nautilus_file = nautilus_file_info_lookup(location);
+
+			if (!nautilus_file) {
+
+				uri = g_file_get_uri(location);
+
+				g_warning(
+					"%s (%s)",
+					_("Could not refresh Nautilus emblems"),
+					uri ? uri : _("unknown location")
+				);
+
+				g_free(uri);
+				return true;
+
+			}
+
+			nautilus_file_info_invalidate_extension_info(nautilus_file);
+
+			if ((strptr = added_emblems)) {
+
+				while (*strptr) {
+
+					nautilus_file_info_add_emblem(nautilus_file, *strptr++);
+
+				}
+
+			}
+
+			g_object_unref(nautilus_file);
+
+		/* fallthrough */
+		default:
+
+			return true;
+
+	}
+
+}
+
+
 static void annotation_session_save (
 	const NautilusAnnotationsSession * const session
 ) {
@@ -396,6 +486,16 @@ static void annotation_session_save (
 		);
 
 	}
+
+	gnui_emblem_picker_save(
+		session->emblem_picker,
+		report_emblems_for_file,
+		GNUI_EMBLEM_PICKER_SAVE_FLAG_CALLBACK_ON_SUCCESS |
+			GNUI_EMBLEM_PICKER_SAVE_FLAG_CALLBACK_ON_ERROR,
+		NULL,
+		NULL,
+		NULL
+	);
 
 }
 
@@ -414,6 +514,20 @@ static void annotation_session_exit (
 
 	}
 
+	if (gnui_emblem_picker_get_modified(session->emblem_picker)) {
+
+		gnui_emblem_picker_save(
+			session->emblem_picker,
+			report_emblems_for_file,
+			GNUI_EMBLEM_PICKER_SAVE_FLAG_CALLBACK_ON_SUCCESS |
+				GNUI_EMBLEM_PICKER_SAVE_FLAG_CALLBACK_ON_ERROR,
+			NULL,
+			NULL,
+			NULL
+		);
+
+	}
+
 	annotation_session_destroy(session);
 
 }
@@ -426,11 +540,12 @@ static void annotation_session_query_discard (
 	if (
 		gtk_text_buffer_get_modified(
 			GTK_TEXT_BUFFER(session->annotation_text)
-		)
+		) ||
+		gnui_emblem_picker_get_modified(session->emblem_picker)
 	) {
 
 		destructive_action_confirm(
-			GTK_WINDOW(session->annotation_dialog),
+			GTK_WINDOW(session->annotation_window),
 			_("Are you sure you want to discard the current changes?"),
 			_("This action cannot be undone."),
 			_("_Discard changes"),
@@ -448,37 +563,61 @@ static void annotation_session_query_discard (
 }
 
 
-static void on_annotation_dialog_response (
-	GtkDialog * const dialog G_GNUC_UNUSED,
-	gint const response_id,
-	NautilusAnnotationsSession * const session
+static gboolean on_window_close (
+	GtkWindow * const window G_GNUC_UNUSED,
+	const gpointer session
 ) {
 
-	switch (response_id) {
-
-		case GTK_RESPONSE_REJECT:
-
-			annotation_session_query_discard(session);
-			return;
-
-		default:
-
-			annotation_session_exit(session);
-
-	}
+	annotation_session_exit(session);
+	return false;
 
 }
 
 
-static void on_text_modified_state_change (
-	GtkSourceBuffer * const annotation_text,
-	const NautilusAnnotationsSession * const session
+static void on_discard_button_clicked (
+	NautilusAnnotationsSession * const session,
+	GtkButton * const discard_button G_GNUC_UNUSED
+) {
+
+	annotation_session_query_discard(session);
+
+}
+
+
+static void on_modified_state_change (
+	const NautilusAnnotationsSession * const session,
+	GtkWidget * const changed_widget G_GNUC_UNUSED
 ) {
 
 	gtk_widget_set_visible(
 		GTK_WIDGET(session->discard_button),
-		gtk_text_buffer_get_modified(GTK_TEXT_BUFFER(annotation_text))
+		gtk_text_buffer_get_modified(
+			GTK_TEXT_BUFFER(session->annotation_text)
+		) || gnui_emblem_picker_get_modified(session->emblem_picker)
 	);
+
+}
+
+
+static void on_exit_action_activate (
+	GSimpleAction * const action G_GNUC_UNUSED,
+	GVariant * const parameter G_GNUC_UNUSED,
+	const gpointer v_session
+) {
+
+	#define session ((NautilusAnnotationsSession *) v_session)
+
+	if (gtk_revealer_get_reveal_child(session->emblem_menu)) {
+
+		gtk_revealer_set_reveal_child(session->emblem_menu, false);
+
+	} else {
+
+		annotation_session_exit(session);
+
+	}
+
+	#undef session
 
 }
 
@@ -513,6 +652,9 @@ static void annotation_session_new_with_text (
 
 	static const GActionEntry a8n_actions[] = {
 		{
+			.name = "exit_session",
+			.activate = on_exit_action_activate
+		}, {
 			.name = "save_session",
 			.activate = on_save_action_activate
 		}, {
@@ -524,10 +666,9 @@ static void annotation_session_new_with_text (
 	NautilusAnnotationsSession
 		* const session = g_new(NautilusAnnotationsSession, 1);
 
-	GtkDialog * const a8n_dialog = GTK_DIALOG(
+	GtkWindow * const a8n_window = GTK_WINDOW(
 		g_object_new(
-			GTK_TYPE_DIALOG,
-			"use-header-bar", true,
+			GTK_TYPE_WINDOW,
 			"modal", true,
 			"transient-for", parent,
 			NULL
@@ -539,9 +680,12 @@ static void annotation_session_new_with_text (
 	gchar * header_subtitle, * tmpbuf = NULL;
 	GSimpleActionGroup * const a8n_action_map = g_simple_action_group_new();
 	GtkEventController * const a8n_controller = gtk_shortcut_controller_new();
-	GtkWidget * _placeholder_1_, * _placeholder_2_;
+	GtkWidget
+		* _widget_placeholder_1_,
+		* _widget_placeholder_2_,
+		* _widget_placeholder_3_;
 
-	session->annotation_dialog = a8n_dialog;
+	session->annotation_window = a8n_window;
 	session->targets = target_files;
 
 	session->annotation_text = gtk_source_buffer_new_with_language(
@@ -550,16 +694,6 @@ static void annotation_session_new_with_text (
 			"markdown"
 		)
 	);
-
-	session->discard_button = GTK_BUTTON(
-		gtk_dialog_add_button(
-			a8n_dialog,
-			_("_Discard changes"),
-			GTK_RESPONSE_REJECT
-		)
-	);
-
-	gtk_widget_hide(GTK_WIDGET(session->discard_button));
 
 	if (initial_text) {
 
@@ -584,14 +718,32 @@ static void annotation_session_new_with_text (
 
 	}
 
-	gtk_widget_add_css_class(
-		GTK_WIDGET(a8n_dialog),
-		"nautilus-annotations-dialog"
+	GList * emblem_picker_files = NULL;
+
+	for (const GList * llnk = target_files; llnk; llnk = llnk->next) {
+
+		emblem_picker_files = g_list_append(
+			emblem_picker_files,
+			nautilus_file_info_get_location(NAUTILUS_FILE_INFO(llnk->data))
+		);
+
+	}
+
+	session->emblem_picker = GNUI_EMBLEM_PICKER(
+		g_object_new(
+			GNUI_TYPE_EMBLEM_PICKER,
+			"mapped-files", emblem_picker_files,
+			"reveal-changes", true,
+			"forbidden-emblems", a8n_picker_forbidden_emblems,
+			NULL
+		)
 	);
 
+	g_list_free_full(emblem_picker_files, g_object_unref);
+
 	gtk_widget_add_css_class(
-		GTK_WIDGET(session->discard_button),
-		"nautilus-annotations-discard"
+		GTK_WIDGET(a8n_window),
+		"nautilus-annotations-window"
 	);
 
 	if (session->targets->next) {
@@ -646,33 +798,123 @@ static void annotation_session_new_with_text (
 
 	}
 
-	#define a8n_title_wgt _placeholder_1_
-	#define a8n_title_lbl _placeholder_2_
+	if (
+		g_utf8_strlen(
+			header_subtitle,
+			strlen(header_subtitle)
+		) > A8N_WINDOW_SUBTITLE_MAX_LENGTH
+	) {
 
-	a8n_title_wgt = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+		const gsize ellip_utf8_length = g_utf8_offset_to_pointer(
+			header_subtitle,
+			A8N_WINDOW_SUBTITLE_MAX_LENGTH
+		) - header_subtitle;
+
+		gchar * const ellipsis = g_malloc(ellip_utf8_length + 4);
+		memcpy(ellipsis, header_subtitle, ellip_utf8_length);
+		memcpy(ellipsis + ellip_utf8_length, "\342\200\246", 4);
+		g_free(tmpbuf);
+		header_subtitle = tmpbuf = ellipsis;
+
+	}
+
+	#define a8n_title_box _widget_placeholder_1_
+	#define a8n_title_lbl _widget_placeholder_2_
+
+	a8n_title_box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
 	a8n_title_lbl = gtk_label_new(header_title);
 	gtk_widget_add_css_class(a8n_title_lbl, "title");
-	gtk_box_append(GTK_BOX(a8n_title_wgt), a8n_title_lbl);
+	gtk_box_append(GTK_BOX(a8n_title_box), a8n_title_lbl);
 
 	#undef a8n_title_lbl
-	#define a8n_subtitle_lbl _placeholder_2_
+	#define a8n_subtitle_lbl _widget_placeholder_2_
 
 	a8n_subtitle_lbl = gtk_label_new(header_subtitle);
 	gtk_widget_add_css_class(a8n_subtitle_lbl, "subtitle");
-	gtk_box_append(GTK_BOX(a8n_title_wgt), a8n_subtitle_lbl);
+	gtk_box_append(GTK_BOX(a8n_title_box), a8n_subtitle_lbl);
 
 	#undef a8n_subtitle_lbl
+	#define a8n_header_bar _widget_placeholder_2_
 
-	gtk_widget_set_valign(a8n_title_wgt, GTK_ALIGN_CENTER);
+	a8n_header_bar = gtk_header_bar_new();
+	gtk_widget_set_valign(a8n_title_box, GTK_ALIGN_CENTER);
 
 	gtk_header_bar_set_title_widget(
-		GTK_HEADER_BAR(gtk_dialog_get_header_bar(GTK_DIALOG(a8n_dialog))),
-		a8n_title_wgt
+		GTK_HEADER_BAR(a8n_header_bar),
+		a8n_title_box
 	);
 
-	#undef a8n_title_wgt
-
 	g_free(tmpbuf);
+	gtk_window_set_titlebar(a8n_window, a8n_header_bar);
+
+	#undef a8n_title_box
+	#define a8n_discard_btn _widget_placeholder_1_
+
+	a8n_discard_btn = gtk_button_new_with_mnemonic(_("_Discard changes"));
+	gtk_widget_set_valign(a8n_discard_btn, GTK_ALIGN_CENTER);
+
+	g_signal_connect_swapped(
+		a8n_discard_btn,
+		"clicked",
+		G_CALLBACK(on_discard_button_clicked),
+		session
+	);
+
+	gtk_widget_hide(a8n_discard_btn);
+	gtk_widget_add_css_class(a8n_discard_btn, "nautilus-annotations-discard");
+	gtk_header_bar_pack_end(GTK_HEADER_BAR(a8n_header_bar), a8n_discard_btn);
+	session->discard_button = GTK_BUTTON(a8n_discard_btn);
+
+	#undef a8n_discard_btn
+	#define a8n_emblems_btn _widget_placeholder_1_
+
+	a8n_emblems_btn = gtk_toggle_button_new();
+
+	gtk_button_set_icon_name(
+		GTK_BUTTON(a8n_emblems_btn),
+		"nautilus-annotations-tag-new"
+	);
+
+	gtk_widget_add_css_class(
+		a8n_emblems_btn,
+		"nautilus-annotations-add-emblem-button"
+	);
+
+	gtk_header_bar_pack_start(GTK_HEADER_BAR(a8n_header_bar), a8n_emblems_btn);
+
+	#undef a8n_header_bar
+	#define a8n_emblem_menu _widget_placeholder_2_
+
+	a8n_emblem_menu = g_object_new(
+		GTK_TYPE_REVEALER,
+		"child", session->emblem_picker,
+		"halign", GTK_ALIGN_START,
+		"valign", GTK_ALIGN_START,
+		NULL
+	);
+
+	g_object_bind_property(
+		a8n_emblems_btn,
+		"active",
+		a8n_emblem_menu,
+		"reveal-child",
+		G_BINDING_BIDIRECTIONAL | G_BINDING_SYNC_CREATE
+	);
+
+	session->emblem_menu = GTK_REVEALER(a8n_emblem_menu);
+
+	#undef a8n_emblems_btn
+	#define a8n_overlay _widget_placeholder_1_
+	#define scrollable _widget_placeholder_3_
+
+	a8n_overlay = gtk_overlay_new();
+	scrollable = gtk_scrolled_window_new();
+	gtk_overlay_set_child(GTK_OVERLAY(a8n_overlay), scrollable);
+	gtk_widget_add_css_class(a8n_emblem_menu, "nautilus-annotations-emblems");
+	gtk_overlay_add_overlay(GTK_OVERLAY(a8n_overlay), a8n_emblem_menu);
+
+	#undef a8n_emblem_menu
+	#define text_area _widget_placeholder_2_
 
 	gdk_monitor_get_geometry(
 		gdk_display_get_monitor_at_surface(
@@ -683,15 +925,11 @@ static void annotation_session_new_with_text (
 	);
 
 	gtk_window_set_default_size(
-		GTK_WINDOW(a8n_dialog),
+		a8n_window,
 		workarea.width ? workarea.width * 2 / 3 : A8N_WIN_FALLBACK_WIDTH,
 		workarea.height ? workarea.height * 2 / 3 : A8N_WIN_FALLBACK_HEIGHT
 	);
 
-	#define scrollable _placeholder_1_
-	#define text_area _placeholder_2_
-
-	scrollable = gtk_scrolled_window_new();
 	text_area = gtk_source_view_new_with_buffer(session->annotation_text);
 	gtk_widget_add_css_class(text_area, "nautilus-annotations-view");
 	gtk_widget_add_css_class(scrollable, "nautilus-annotations-scrollable");
@@ -699,26 +937,30 @@ static void annotation_session_new_with_text (
 	gtk_widget_set_hexpand(text_area, true);
 	gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(text_area), GTK_WRAP_WORD);
 	gtk_scrolled_window_set_child(GTK_SCROLLED_WINDOW(scrollable), text_area);
-
-	gtk_box_append(
-		GTK_BOX(gtk_dialog_get_content_area(a8n_dialog)),
-		scrollable
-	);
+	gtk_window_set_child(a8n_window, a8n_overlay);
 
 	#undef scrollable
 	#undef text_area
+	#undef a8n_overlay
 
-	g_signal_connect(
-		a8n_dialog,
-		"response",
-		G_CALLBACK(on_annotation_dialog_response),
+	g_signal_connect_swapped(
+		session->annotation_text,
+		"modified-changed",
+		G_CALLBACK(on_modified_state_change),
+		session
+	);
+
+	g_signal_connect_swapped(
+		session->emblem_picker,
+		"modified-changed",
+		G_CALLBACK(on_modified_state_change),
 		session
 	);
 
 	g_signal_connect(
-		session->annotation_text,
-		"modified-changed",
-		G_CALLBACK(on_text_modified_state_change),
+		a8n_window,
+		"close-request",
+		G_CALLBACK(on_window_close),
 		session
 	);
 
@@ -730,7 +972,7 @@ static void annotation_session_new_with_text (
 	);
 
 	gtk_widget_insert_action_group(
-		GTK_WIDGET(a8n_dialog),
+		GTK_WIDGET(a8n_window),
 		"a8n",
 		G_ACTION_GROUP(a8n_action_map)
 	);
@@ -739,7 +981,7 @@ static void annotation_session_new_with_text (
 		GTK_SHORTCUT_CONTROLLER(a8n_controller),
 		gtk_shortcut_new_with_arguments(
 			gtk_keyval_trigger_new(GDK_KEY_S, GDK_CONTROL_MASK),
-			gtk_named_action_new ("a8n.save_session"),
+			gtk_named_action_new("a8n.save_session"),
 			NULL
 		)
 	);
@@ -748,14 +990,23 @@ static void annotation_session_new_with_text (
 		GTK_SHORTCUT_CONTROLLER(a8n_controller),
 		gtk_shortcut_new_with_arguments(
 			gtk_keyval_trigger_new(GDK_KEY_Escape, GDK_SHIFT_MASK),
-			gtk_named_action_new ("a8n.discard_session"),
+			gtk_named_action_new("a8n.discard_session"),
+			NULL
+		)
+	);
+
+	gtk_shortcut_controller_add_shortcut(
+		GTK_SHORTCUT_CONTROLLER(a8n_controller),
+		gtk_shortcut_new_with_arguments(
+			gtk_keyval_trigger_new(GDK_KEY_Escape, 0),
+			gtk_named_action_new("a8n.exit_session"),
 			NULL
 		)
 	);
 
 	g_object_unref(a8n_action_map);
-	gtk_widget_add_controller(GTK_WIDGET(a8n_dialog), a8n_controller);
-	gtk_window_present(GTK_WINDOW(a8n_dialog));
+	gtk_widget_add_controller(GTK_WIDGET(a8n_window), a8n_controller);
+	gtk_window_present(a8n_window);
 
 }
 
@@ -832,7 +1083,7 @@ static void on_annotate_menuitem_activate (
 
 			uri = nautilus_file_info_get_uri(NAUTILUS_FILE_INFO(iter->data));
 
-			g_message(
+			g_warning(
 				"%s (%s) // %s",
 				_("Could not access file's annotations"),
 				uri ? uri : _("unknown location"),
@@ -1240,14 +1491,14 @@ static NautilusOperationResult nautilus_annotations_update_file_info (
 			) > A8N_COLUMN_MAX_LENGTH
 		) {
 
-			gsize a8n_size = g_utf8_offset_to_pointer(
+			const gsize a8n_utf8_size = g_utf8_offset_to_pointer(
 				a8n_probe,
 				A8N_COLUMN_MAX_LENGTH
 			) - a8n_probe;
 
-			gchar * a8n_preview = g_malloc(a8n_size + 4);
-			memcpy(a8n_preview, a8n_probe, a8n_size);
-			memcpy(a8n_preview + a8n_size, "\342\200\246", 4);
+			gchar * a8n_preview = g_malloc(a8n_utf8_size + 4);
+			memcpy(a8n_preview, a8n_probe, a8n_utf8_size);
+			memcpy(a8n_preview + a8n_utf8_size, "\342\200\246", 4);
 
 			nautilus_file_info_add_string_attribute(
 				nautilus_file,
@@ -1417,12 +1668,31 @@ GType nautilus_annotations_get_type (void) {
 
 void nautilus_module_shutdown (void) {
 
+	GdkDisplay * const display = gdk_display_get_default();
+
 	gtk_style_context_remove_provider_for_display(
-		gdk_display_get_default(),
-		GTK_STYLE_PROVIDER(annotations_css)
+		display,
+		GTK_STYLE_PROVIDER(emblem_picker_css)
 	);
 
-	g_object_unref(annotations_css);
+	gtk_style_context_remove_provider_for_display(
+		display,
+		GTK_STYLE_PROVIDER(a8n_fallback_css)
+	);
+
+	g_object_unref(emblem_picker_css);
+	g_object_unref(a8n_fallback_css);
+
+	if (a8n_theme_css) {
+
+		gtk_style_context_remove_provider_for_display(
+			display,
+			GTK_STYLE_PROVIDER(a8n_theme_css)
+		);
+
+		g_object_unref(a8n_theme_css);
+
+	}
 
 }
 
@@ -1442,11 +1712,12 @@ void nautilus_module_initialize (
 	GTypeModule * const module
 ) {
 
+	GdkDisplay * const display = gdk_display_get_default();
+
 	I18N_INIT();
 	nautilus_annotations_register_type(module);
 	*provider_types = nautilus_annotations_get_type();
 	nautilus_app = GTK_APPLICATION(g_application_get_default());
-	annotations_css = gtk_css_provider_new();
 
 	/*
 
@@ -1463,7 +1734,23 @@ void nautilus_module_initialize (
 		NULL
 	);
 
-	GFileInfo * const finfo = g_file_query_info(
+	enum {
+		A8N_CSS_FILE_FLAG_NONE = 0,
+		A8N_CSS_FILE_FLAG_SYSTEM_THEME = true,
+		A8N_CSS_FILE_FLAG_MISSING = 2,
+		A8N_CSS_FILE_FLAG_UNREADABLE = 4
+	};
+
+	GFileInfo * finfo;
+	bool b_try_system_theme = false;
+
+
+	/* \                                /\
+	\ */     load_theme_css:           /* \
+	 \/     ______________________     \ */
+
+
+	finfo = g_file_query_info(
 		css_file,
 		G_FILE_ATTRIBUTE_ACCESS_CAN_READ,
 		G_FILE_QUERY_INFO_NONE,
@@ -1471,28 +1758,21 @@ void nautilus_module_initialize (
 		NULL
 	);
 
-	enum {
-		FILE_IS_GOOD,
-		FILE_IS_MISSING,
-		FILE_IS_UNREADABLE
-	};
-
 	switch(
-		!finfo ? FILE_IS_MISSING
+		!finfo ? A8N_CSS_FILE_FLAG_MISSING | b_try_system_theme
 		: !g_file_info_get_attribute_boolean(
 			finfo,
 			G_FILE_ATTRIBUTE_ACCESS_CAN_READ
-		) ? FILE_IS_UNREADABLE
-		: FILE_IS_GOOD
+		) ? A8N_CSS_FILE_FLAG_UNREADABLE | b_try_system_theme
+		: A8N_CSS_FILE_FLAG_NONE | b_try_system_theme
 	) {
 
-		case FILE_IS_UNREADABLE:
+		case A8N_CSS_FILE_FLAG_UNREADABLE:
 
 			g_object_unref(finfo);
-			/*  No case break (fallthrough)  */
 
 		/* fallthrough */
-		case FILE_IS_MISSING:
+		case A8N_CSS_FILE_FLAG_MISSING:
 
 			g_object_unref(css_file);
 
@@ -1502,23 +1782,65 @@ void nautilus_module_initialize (
 				NULL
 			);
 
-			/*  No case break (fallthrough)  */
+			b_try_system_theme = true;
+			goto load_theme_css;
+
+		case A8N_CSS_FILE_FLAG_UNREADABLE | A8N_CSS_FILE_FLAG_SYSTEM_THEME:
+
+			g_object_unref(finfo);
 
 		/* fallthrough */
+		case A8N_CSS_FILE_FLAG_MISSING | A8N_CSS_FILE_FLAG_SYSTEM_THEME:
+
+			g_object_unref(css_file);
+			break;
+
 		default:
 
-			gtk_css_provider_load_from_file(annotations_css, css_file);
+			a8n_theme_css = gtk_css_provider_new();
+			gtk_css_provider_load_from_file(a8n_theme_css, css_file);
 			g_object_unref(css_file);
 
 			gtk_style_context_add_provider_for_display(
-				gdk_display_get_default(),
-				GTK_STYLE_PROVIDER(annotations_css),
+				display,
+				GTK_STYLE_PROVIDER(a8n_theme_css),
 				GTK_STYLE_PROVIDER_PRIORITY_APPLICATION
 			);
 
 			/*  No case break (last case)  */
 
 	}
+
+	gtk_icon_theme_set_resource_path(
+		gtk_icon_theme_get_for_display(display),
+		a8n_resource_icon_paths
+	);
+
+	a8n_fallback_css = gtk_css_provider_new();
+
+	gtk_css_provider_load_from_resource(
+		a8n_fallback_css,
+		"/org/gnome/nautilus/annotations/style.css"
+	);
+
+	gtk_style_context_add_provider_for_display (
+		display,
+		GTK_STYLE_PROVIDER(a8n_fallback_css),
+		GTK_STYLE_PROVIDER_PRIORITY_THEME
+	);
+
+	emblem_picker_css = gtk_css_provider_new();
+
+	gtk_css_provider_load_from_resource(
+		emblem_picker_css,
+		"/org/gnome/nautilus/annotations/emblem-picker/style.css"
+	);
+
+	gtk_style_context_add_provider_for_display (
+		display,
+		GTK_STYLE_PROVIDER(emblem_picker_css),
+		GTK_STYLE_PROVIDER_PRIORITY_THEME
+	);
 
 }
 

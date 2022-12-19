@@ -2,6 +2,13 @@ NEWS
 ====
 
 
+## 2.0.0
+
+* The annotation window has got an emblem picker!
+* The path displayed in the window title is now ellipsized when longer than 99
+  characters
+
+
 ## 1.0.0
 
 * The extension can be considered stable enough; the version string has been

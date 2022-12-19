@@ -1,6 +1,6 @@
 {
 	"name": "nautilus-annotations",
-	"version": "1.0.0",
+	"version": "2.0.0",
 	"description": "Annotate files and directories",
 	"homepage": "https://gitlab.gnome.org/madmurphy/nautilus-annotations",
 	"author": "madmurphy333@gmail.com",
@@ -12,6 +12,7 @@
 	"dependencies": {
 		"glib": ">=2",
 		"libnautilus-extension": ">=4",
+		"libadwaita": ">=1",
 		"gtk": ">=4",
 		"gtksourceview": ">=5"
 	},

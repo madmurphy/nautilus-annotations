@@ -22,9 +22,6 @@ dist_themes_DATA = \
 	themes/README.md \
 	@CSS_THEMES@
 
-nodist_pkgdata_DATA = \
-	no-dist/style.css
-
 # Launch
 #
 #     echo "nobase_dist_data_DATA =$(find icons -type f -printf ' \\\n\t%p')"
@@ -140,6 +137,10 @@ EXTRA_DIST = \
 	package.json \
 	.editorconfig
 
+nodist_pkgdata_DATA =
+
+BUILT_SOURCES =
+
 
 if NLS_ENABLED
 
@@ -153,9 +154,6 @@ EXTRA_DIST += \
 
 endif !NLS_ENABLED
 
-
-BUILT_SOURCES = \
-	no-dist/style.css
 
 _clean_dirs_ = \
 	no-dist
@@ -205,12 +203,22 @@ _bootstrapclean_dirs_ += \
 _bootstrapclean_files_ += \
 	`$(FIND) -L . -type f -name 'Makefile.in'`
 
-endif
+endif HAVE_FIND
 
+
+if HAVE_CSS_THEME
+
+nodist_pkgdata_DATA += \
+	no-dist/style.css
+
+BUILT_SOURCES += \
+	no-dist/style.css
 
 no-dist/style.css: $(CSS_THEME)
 	(test -d no-dist || (rm -f no-dist && $(MKDIR_P) no-dist)) && \
 	cp '$(CSS_THEME)' '$@';
+
+endif HAVE_CSS_THEME
 
 
 # Remove `$(docdir)` and `$(pkgdatadir)` on uninstall
@@ -231,7 +239,8 @@ distclean-local:
 i18n-update:
 	$(MKDIR_P) 'po/backups' && $(GREP) -o '^\s*\w\S\+' 'po/LINGUAS' | \
 	while read _i_; do cp "po/$${_i_}.po" "po/backups/$${_i_}.po.bak" && \
-	$(MAKE) -C 'po' "$${_i_}.po" && sed -i \
+	rm -f 'po/@PACKAGE_TARNAME@.pot' && $(MAKE) -C 'po' "$${_i_}.po" && \
+	sed -i \
 	's/"Project-Id-Version:.*$$/"Project-Id-Version: @PACKAGE_TARNAME@ @PACKAGE_VERSION@\\n"/' \
 	"po/$${_i_}.po"; done;
 

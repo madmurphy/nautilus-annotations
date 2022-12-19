@@ -78,6 +78,16 @@ autoconf --version < /dev/null > /dev/null 2>&1 || {
 	DIE=1
 } >&2
 
+if grep "^GTK_DOC_CHECK" "${srcdir}/configure.ac" >/dev/null; then
+	which gtkdocize > /dev/null 2>&1 || {
+		echo
+		echo '**Error**: You must have `gtk-doc` installed. You can get it from'
+		echo 'https://gitlab.gnome.org/GNOME/gtk-doc/'
+		echo
+		DIE=1
+	} >&2
+fi
+
 if grep "^IT_PROG_INTLTOOL" "${srcdir}/configure.ac" >/dev/null; then
 	intltoolize --version < /dev/null > /dev/null 2>&1 || {
 		echo
@@ -210,44 +220,55 @@ for coin in `find "${srcdir}" -path "${srcdir}/CVS" -prune -o -name configure.ac
 		echo "Processing '${dr}' ..."
 		( cd "${dr}"
 
-			aclocalinclude="${ACLOCAL_FLAGS}"
 			[[ -d 'm4' ]] || mkdir 'm4'
+			aclocalinclude="${ACLOCAL_FLAGS}"
 
+			if grep "^GTK_DOC_CHECK" "${srcdir}/configure.ac" >/dev/null; then
+				if [[ -d 'docgen/reference' ]]; then
+					_GTKDOCDIR_='docgen/reference'
+				elif [[ -d 'doc/reference' ]]; then
+					_GTKDOCDIR_='doc/reference'
+				else
+					_GTKDOCDIR_='docs/reference'
+				fi
+				echo "Running gtkdocize --copy --docdir '${_GTKDOCDIR_}' ..."
+				gtkdocize --copy --docdir "${_GTKDOCDIR_}" < /dev/null > /dev/null 2>&1
+			fi
 			if grep "^AM_GNU_GETTEXT" configure.ac >/dev/null; then
-				echo 'Running autopoint...'
+				echo 'Running autopoint --force ...'
 				autopoint --force
 			fi
 			if grep "^AM_GLIB_GNU_GETTEXT" configure.ac >/dev/null; then
 				echo "Creating ${dr}/aclocal.m4..."
 				test -r "${dr}/aclocal.m4" || touch "${dr}/aclocal.m4"
-				echo 'Running glib-gettextize...  Ignore non-fatal messages.'
+				echo 'Running glib-gettextize --force --copy ...  Ignore non-fatal messages.'
 				echo 'no' | glib-gettextize --force --copy
 				echo "Making ${dr}/aclocal.m4 writable..."
 				test -r "${dr}/aclocal.m4" && chmod u+w "${dr}/aclocal.m4"
 			fi
 			if grep "^IT_PROG_INTLTOOL" configure.ac >/dev/null; then
-				echo 'Running intltoolize...'
+				echo 'Running intltoolize --copy --force --automake ...'
 				intltoolize --copy --force --automake
 			fi
 			if grep "^AM_PROG_XML_I18N_TOOLS" configure.ac >/dev/null; then
-				echo 'Running xml-i18n-toolize...'
+				echo 'Running xml-i18n-toolize --copy --force --automake ...'
 				xml-i18n-toolize --copy --force --automake
 			fi
 			if grep "^LT_INIT" configure.ac >/dev/null; then
 				if test -z "${NO_LIBTOOLIZE}" ; then
-					echo 'Running libtoolize...'
+					echo 'Running libtoolize --force --copy ...'
 					"${LIBTOOLIZE}" --force --copy
 				fi
 			fi
 			echo "Running aclocal ${aclocalinclude} ..."
 			aclocal ${aclocalinclude}
 			if grep "^A[CM]_CONFIG_HEADER" configure.ac >/dev/null; then
-				echo 'Running autoheader...'
+				echo 'Running autoheader ...'
 				autoheader
 			fi
 			echo "Running automake --gnu ${am_opt} ..."
 			automake --add-missing --copy --gnu ${am_opt}
-			echo 'Running autoconf...'
+			echo 'Running autoconf ...'
 			autoconf
 		)
 	fi
@@ -256,7 +277,7 @@ done
 if test "${NOCONFIGURE}" -eq 0; then
 	echo -n "Running ${srcdir}/configure"
 	for __CF_ARG__ in "${CONFIGURE_ARGS[@]}"; do
-		echo -n " [${__CF_ARG__}]"
+		echo -n " '${__CF_ARG__}'"
 	done
 	echo ' ...'
 	if "${srcdir}/configure" "${CONFIGURE_ARGS[@]}"; then

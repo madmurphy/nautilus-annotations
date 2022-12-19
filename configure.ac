@@ -9,7 +9,7 @@ dnl  **************************************************************************
 AC_PREREQ([2.69])
 
 AC_INIT([Nautilus Annotations],
-	[1.0.0],
+	[2.0.0],
 	[madmurphy333@gmail.com],
 	[nautilus-annotations],
 	[https://gitlab.gnome.org/madmurphy/nautilus-annotations])
@@ -26,7 +26,7 @@ AC_CONFIG_FILES([Makefile
 src/Makefile
 po/Makefile.in])
 
-AM_INIT_AUTOMAKE([1.11])
+AM_INIT_AUTOMAKE([subdir-objects])
 
 AM_SILENT_RULES([yes])
 
@@ -40,7 +40,7 @@ AS_IF([test "x${HAVE_PKGCONFIG}" = xno],
 	[AC_MSG_ERROR([you need to have pkgconfig installed!])])
 
 PKG_CHECK_MODULES([NAUTILUS_ANNOTATIONS],
-	[glib-2.0 gtk4 gtksourceview-5 libnautilus-extension-4])
+	[glib-2.0, libadwaita-1, gtk4, gtksourceview-5, libnautilus-extension-4])
 
 AC_ARG_VAR([FIND], [Unix find utility])
 
@@ -74,6 +74,8 @@ AC_ARG_WITH([theme],
 		install any theme @{:@--without-theme@:}@
 		@<:@default=]NA_DEFAULT_THEME[@:>@])],
 	[AS_CASE(["x${withval}"],
+		['xno'],
+			[AS_VAR_SET([CSS_THEME], [])],
 		m4_quote(m4_map_args_sep(['x], ['], [|], NA_CSS_THEMES)),
 			[AS_VAR_SET([CSS_THEME],
 				['@S|@@{:@top_srcdir@:}@/]NA_THEMES_DIR[/'"${withval}"'-theme.css'])],
@@ -84,6 +86,8 @@ AC_ARG_WITH([theme],
 	[AS_VAR_SET([CSS_THEME],
 		['@S|@@{:@top_srcdir@:}@/]NA_THEMES_DIR[/]NA_DEFAULT_THEME[-theme.css'])])
 
+AM_CONDITIONAL([HAVE_CSS_THEME], [test "x${CSS_THEME}" != 'x'])
+
 
 dnl  **************************************************************************
 dnl     I N T E R N A T I O N A L I Z A T I O N
@@ -93,7 +97,7 @@ AM_GNU_GETTEXT([external])
 
 AM_GNU_GETTEXT_VERSION([0.19])
 
-AM_CONDITIONAL([NLS_ENABLED], [test "x${USE_NLS}" != xno])
+AM_CONDITIONAL([NLS_ENABLED], [test "x${USE_NLS}" != 'xno'])
 
 AM_COND_IF([NLS_ENABLED], [
 	AC_SUBST([GETTEXT_PACKAGE], AC_PACKAGE_TARNAME)

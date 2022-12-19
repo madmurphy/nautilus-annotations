@@ -3,9 +3,6 @@
 Please bear in mind that this CSS affects the entire screen, not just the
 annotations window, so be careful with wildcard selectors.
 
-This CSS overrides themes' styles. If you want to create a custom CSS for this
-extension consider to add it to a theme instead of editing this file.
-
 For information about Nautilus Annotations' DOM tree and all available
 selectors please refer to `/usr/share/doc/nautilus-annotations/styling.md`.
 
@@ -13,4 +10,10 @@ selectors please refer to `/usr/share/doc/nautilus-annotations/styling.md`.
 
 textview.nautilus-annotations-view {
 	font-family: monospace;
+}
+
+revealer.nautilus-annotations-emblems {
+	background-color: rgba(255, 255, 255, .95);
+	box-shadow: 6px 6px 15px 0 rgba(0, 0, 0, .4);
+	border-radius: 0 0 12px 12px;
 }

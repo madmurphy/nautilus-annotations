@@ -8,13 +8,13 @@ selectors please refer to `/usr/share/doc/nautilus-annotations/styling.md`.
 
 */
 
-window.nautilus-annotations-dialog {
+window.nautilus-annotations-window {
 	border: none;
 	background-image: none;
 	background-color: #474747;
 }
 
-window.nautilus-annotations-dialog .titlebar {
+window.nautilus-annotations-window .titlebar {
 	border: none;
 	background-image: none;
 	background-color: transparent;
@@ -22,26 +22,27 @@ window.nautilus-annotations-dialog .titlebar {
 	box-shadow: none;
 }
 
-window.nautilus-annotations-dialog selection {
+window.nautilus-annotations-window selection {
 	background-image: none;
 	background-color: #fff;
 	color: #474747;
 }
 
-window.nautilus-annotations-dialog text,
-window.nautilus-annotations-dialog button {
+window.nautilus-annotations-window text,
+window.nautilus-annotations-window button {
 	background-image: none;
 	background-color: transparent;
 	color: #fff;
 }
 
-window.nautilus-annotations-dialog button.close {
+window.nautilus-annotations-window button.close {
 	color: #c1c1c1;
 	border: none;
 	box-shadow: none;
 }
 
-window.nautilus-annotations-dialog button.nautilus-annotations-discard {
+window.nautilus-annotations-window button.nautilus-annotations-add-emblem-button,
+window.nautilus-annotations-window button.nautilus-annotations-discard {
 	padding: 1px 7px;
 	background-color: #ddd;
 	color: #2e3436;
@@ -50,7 +51,8 @@ window.nautilus-annotations-dialog button.nautilus-annotations-discard {
 	transition: background-color .3s 0s linear;
 }
 
-window.nautilus-annotations-dialog button.nautilus-annotations-discard:hover {
+window.nautilus-annotations-window button.nautilus-annotations-add-emblem-button:hover,
+window.nautilus-annotations-window button.nautilus-annotations-discard:hover {
 	background-color: #eaeaea;
 	color: #2e3436;
 	transition: background-color .5s 0s linear;
@@ -62,4 +64,14 @@ textview.nautilus-annotations-view {
 	background-image: none;
 	background-color: transparent;
 	color: #fff;
+}
+
+window.nautilus-annotations-window button.nautilus-annotations-add-emblem-button:checked {
+	background: #bbb;
+}
+
+revealer.nautilus-annotations-emblems {
+	background-color: #474747;
+	box-shadow: 6px 6px 15px 0 rgba(0, 0, 0, .4);
+	border-radius: 0 0 12px 12px;
 }

@@ -8,13 +8,13 @@ selectors please refer to `/usr/share/doc/nautilus-annotations/styling.md`.
 
 */
 
-window.nautilus-annotations-dialog {
+window.nautilus-annotations-window {
 	border: none;
 	background-image: none;
 	background-color: #fff394;
 }
 
-window.nautilus-annotations-dialog .titlebar {
+window.nautilus-annotations-window .titlebar {
 	border: none;
 	background-image: none;
 	background-color: transparent;
@@ -22,26 +22,26 @@ window.nautilus-annotations-dialog .titlebar {
 	box-shadow: none;
 }
 
-window.nautilus-annotations-dialog selection {
+window.nautilus-annotations-window selection {
 	background-image: none;
 	background-color: #ad5f00;
 	color: #fff394;
 }
 
-window.nautilus-annotations-dialog text,
-window.nautilus-annotations-dialog button {
+window.nautilus-annotations-window text,
+window.nautilus-annotations-window button {
 	background-image: none;
 	background-color: transparent;
 	color: #ad5f00;
 }
 
-window.nautilus-annotations-dialog button.close {
+window.nautilus-annotations-window button.close {
 	color: #cc0000;
 	border: none;
 	box-shadow: none;
 }
 
-window.nautilus-annotations-dialog button.nautilus-annotations-discard {
+window.nautilus-annotations-window button.nautilus-annotations-discard {
 	padding: 0 6px;
 	background-color: #ad5f00;
 	color: #fff394;
@@ -56,4 +56,14 @@ textview.nautilus-annotations-view {
 	background-image: none;
 	background-color: transparent;
 	color: #ad5f00;
+}
+
+window.nautilus-annotations-window button.nautilus-annotations-add-emblem-button:checked {
+	background: rgba(0, 0, 0, .1);
+}
+
+revealer.nautilus-annotations-emblems {
+	background-color: #efe486;
+	box-shadow: 6px 6px 15px 0 rgba(0, 0, 0, .1);
+	border-radius: 0 0 12px 12px;
 }

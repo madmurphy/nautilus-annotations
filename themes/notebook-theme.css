@@ -8,14 +8,14 @@ selectors please refer to `/usr/share/doc/nautilus-annotations/styling.md`.
 
 */
 
-window.nautilus-annotations-dialog {
+window.nautilus-annotations-window {
 	border: none;
 	background-color: transparent;
 	background-image: none;
 	color: #000;
 }
 
-window.nautilus-annotations-dialog .titlebar {
+window.nautilus-annotations-window .titlebar {
 	border: none;
 	background-color: rgba(255, 255, 255, .95);
 	background-image:
@@ -26,26 +26,26 @@ window.nautilus-annotations-dialog .titlebar {
 	margin: 0;
 }
 
-window.nautilus-annotations-dialog selection {
+window.nautilus-annotations-window selection {
 	background-image: none;
 	background-color: rgba(255, 255, 0, .2);
 	color: #000;
 }
 
-window.nautilus-annotations-dialog text,
-window.nautilus-annotations-dialog button {
+window.nautilus-annotations-window text,
+window.nautilus-annotations-window button {
 	background-image: none;
 	background-color: transparent;
 	color: #000;
 }
 
-window.nautilus-annotations-dialog button.close {
+window.nautilus-annotations-window button.close {
 	color: #000;
 	border: none;
 	box-shadow: none;
 }
 
-window.nautilus-annotations-dialog button.nautilus-annotations-discard {
+window.nautilus-annotations-window button.nautilus-annotations-discard {
 	padding: 1px 7px;
 	background-image: none;
 	background-color: rgba(255, 255, 0, .2);
@@ -58,7 +58,7 @@ window.nautilus-annotations-dialog button.nautilus-annotations-discard {
 	transition: background-color .3s 0s linear, box-shadow  .3s 0s linear;
 }
 
-window.nautilus-annotations-dialog button.nautilus-annotations-discard:hover {
+window.nautilus-annotations-window button.nautilus-annotations-discard:hover {
 	background-color: rgba(255, 255, 0, .4);
 	box-shadow: 0 0 2px 2px rgba(255, 255, 0, .4);
 	transition: background-color 1s 0s linear, box-shadow  1s 0s linear;
@@ -79,4 +79,14 @@ textview.nautilus-annotations-view {
 	line-height: 1.2em;
 	background-color: transparent; 
 	background-image: none;
+}
+
+window.nautilus-annotations-window button.nautilus-annotations-add-emblem-button:checked {
+	background: rgba(0, 0, 0, .1);
+}
+
+revealer.nautilus-annotations-emblems {
+	background-color: rgba(255, 255, 255, .95);
+	box-shadow: 6px 6px 15px 0 rgba(0, 0, 0, .4);
+	border-radius: 0 0 12px 12px;
 }

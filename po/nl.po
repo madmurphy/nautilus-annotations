@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: nautilus-annotations 1.0.0\n"
 "Report-Msgid-Bugs-To: madmurphy333@gmail.com\n"
-"POT-Creation-Date: 2021-09-20 14:27+0200\n"
+"POT-Creation-Date: 2022-12-18 02:41+0000\n"
 "PO-Revision-Date: 2021-09-20 14:27+0200\n"
 "Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
 "Language-Team: \n"
@@ -19,147 +19,184 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 3.0\n"
 
-#: src/nautilus-annotations.c:262
+#: src/nautilus-annotations.c:280
 msgid "Could not erase file's annotations"
 msgstr "De aantekeningen kunnen niet worden gewist"
 
-#: src/nautilus-annotations.c:263 src/nautilus-annotations.c:367
-#: src/nautilus-annotations.c:838
+#: src/nautilus-annotations.c:281 src/nautilus-annotations.c:385
+#: src/nautilus-annotations.c:427 src/nautilus-annotations.c:445
+#: src/nautilus-annotations.c:1089 src/emblem-picker/gnui-emblem-picker.c:1404
 msgid "unknown location"
 msgstr "Onbekende locatie"
 
-#: src/nautilus-annotations.c:366
+#: src/nautilus-annotations.c:384
 msgid "Could not save file's annotations"
 msgstr "De aantekeningen kunnen niet worden opgeslagen"
 
-#: src/nautilus-annotations.c:434
+#: src/nautilus-annotations.c:426
+msgid "Could not save file's emblems"
+msgstr ""
+
+#: src/nautilus-annotations.c:428
+msgid "Unknown error"
+msgstr ""
+
+#: src/nautilus-annotations.c:444
+msgid "Could not refresh Nautilus emblems"
+msgstr ""
+
+#: src/nautilus-annotations.c:549
 msgid "Are you sure you want to discard the current changes?"
 msgstr "Weet u zeker dat u de huidige aanpassingen wilt verwerpen?"
 
-#: src/nautilus-annotations.c:435
+#: src/nautilus-annotations.c:550
 msgid "This action cannot be undone."
 msgstr "Dit kan niet ongedaan worden gemaakt."
 
-#: src/nautilus-annotations.c:436 src/nautilus-annotations.c:557
+#: src/nautilus-annotations.c:551 src/nautilus-annotations.c:853
 msgid "_Discard changes"
 msgstr "Wijzigingen verwer_pen"
 
-#: src/nautilus-annotations.c:599
+#: src/nautilus-annotations.c:751
 msgid "Shared annotations"
 msgstr "Gedeelde aantekeningen"
 
-#: src/nautilus-annotations.c:600
+#: src/nautilus-annotations.c:752
 msgid "(multiple objects)"
 msgstr "(meerdere items)"
 
-#: src/nautilus-annotations.c:610 src/nautilus-annotations.c:1294
+#: src/nautilus-annotations.c:762 src/nautilus-annotations.c:1545
 msgid "Annotations"
 msgstr "Aantekeningen"
 
-#: src/nautilus-annotations.c:643
+#: src/nautilus-annotations.c:795
 msgid "Unknown path"
 msgstr "Onbekende locatie"
 
-#: src/nautilus-annotations.c:803
+#: src/nautilus-annotations.c:1054
 msgid "No files were selected to be annotated"
 msgstr "Er zijn geen bestanden geselecteerd"
 
-#: src/nautilus-annotations.c:837
+#: src/nautilus-annotations.c:1088
 msgid "Could not access file's annotations"
 msgstr "De aantekeningen kunnen niet worden geopend"
 
-#: src/nautilus-annotations.c:876
+#: src/nautilus-annotations.c:1127
 msgid "At least two annotations in the file selection differ"
 msgstr "Minstens twee aantekeningen in de selectie verschillen van elkaar"
 
-#: src/nautilus-annotations.c:877
+#: src/nautilus-annotations.c:1128
 msgid "This will set up a blank new annotation."
 msgstr "Hiermee maakt u een nieuwe, blanco aantekening."
 
-#: src/nautilus-annotations.c:928
+#: src/nautilus-annotations.c:1179
 msgid "No files were selected to be unannotated"
 msgstr "Er zijn geen bestanden geselecteerd"
 
-#: src/nautilus-annotations.c:935
+#: src/nautilus-annotations.c:1186
 msgid "Do you really want to erase the annotations attached?"
 msgstr "Weet u zeker dat u de bijgevoegde aantekeningen wilt wissen?"
 
-#: src/nautilus-annotations.c:936
+#: src/nautilus-annotations.c:1187
 msgid "The annotations will be lost forever."
 msgstr "Ze worden permanent verwijderd."
 
-#: src/nautilus-annotations.c:937 src/nautilus-annotations.c:1098
+#: src/nautilus-annotations.c:1188 src/nautilus-annotations.c:1349
 msgid "E_rase"
 msgstr "W_issen"
 
-#: src/nautilus-annotations.c:1043
+#: src/nautilus-annotations.c:1294
 msgid "Directory's _annotations"
 msgid_plural "Directories' _annotations"
 msgstr[0] "Map_aantekeningen"
 msgstr[1] "_Aantekeningen van mappen"
 
-#: src/nautilus-annotations.c:1050
+#: src/nautilus-annotations.c:1301
 msgid "File's _annotations"
 msgid_plural "Files' _annotations"
 msgstr[0] "Bestands_aantekeningen"
 msgstr[1] "_Aantekeningen van bestanden"
 
-#: src/nautilus-annotations.c:1055
+#: src/nautilus-annotations.c:1306
 msgid "Objects' _annotations"
 msgstr "Item_aantekeningen"
 
-#: src/nautilus-annotations.c:1059
+#: src/nautilus-annotations.c:1310
 msgid "Choose an action for the object's annotations"
 msgid_plural "Choose an action for the objects' annotations"
 msgstr[0] "Kies een actie voor de itemaantekeningen"
 msgstr[1] "Kies een actie voor de aantekeningen van de items"
 
-#: src/nautilus-annotations.c:1074
+#: src/nautilus-annotations.c:1325
 msgid "_Edit and extend"
 msgstr "B_ewerken en uitbreiden"
 
-#: src/nautilus-annotations.c:1076
+#: src/nautilus-annotations.c:1327
 msgid "_Edit"
 msgstr "B_ewerken"
 
-#: src/nautilus-annotations.c:1080
+#: src/nautilus-annotations.c:1331
 msgid "Edit and extend the annotations attached to the selected objects"
 msgstr "Bewerk en breidt de bijgevoegde aantekeningen uit"
 
-#: src/nautilus-annotations.c:1086
+#: src/nautilus-annotations.c:1337
 msgid "Edit the annotations attached to the selected object"
 msgid_plural "Edit the annotations attached to the selected objects"
 msgstr[0] "Bewerk en breidt de bijgevoegde aantekeningen uit"
 msgstr[1] "Bewerk en breidt de bijgevoegde aantekeningen uit"
 
-#: src/nautilus-annotations.c:1101
+#: src/nautilus-annotations.c:1352
 msgid "Remove the annotations attached to the selected object"
 msgid_plural "Remove the annotations attached to the selected objects"
 msgstr[0] "Verwijder de bijgevoegde aantekeningen van het item"
 msgstr[1] "Verwijder de bijgevoegde aantekeningen van de items"
 
-#: src/nautilus-annotations.c:1133
+#: src/nautilus-annotations.c:1384
 msgid "_Annotate directory"
 msgid_plural "_Annotate directories"
 msgstr[0] "Map_aantekening maken"
 msgstr[1] "_Aantekening bij mappen maken"
 
-#: src/nautilus-annotations.c:1140
+#: src/nautilus-annotations.c:1391
 msgid "_Annotate file"
 msgid_plural "_Annotate files"
 msgstr[0] "Bestands_aantekening maken"
 msgstr[1] "_Aantekeningen bij bestanden maken"
 
-#: src/nautilus-annotations.c:1145
+#: src/nautilus-annotations.c:1396
 msgid "_Annotate objects"
 msgstr "Item_aantekeningen maken"
 
-#: src/nautilus-annotations.c:1149
+#: src/nautilus-annotations.c:1400
 msgid "Attach an annotation to the selected object"
 msgid_plural "Attach an annotation to the selected objects"
 msgstr[0] "Voeg een aantekening toe aan het item"
 msgstr[1] "Voeg een aantekening toe aan de items"
 
-#: src/nautilus-annotations.c:1295
+#: src/nautilus-annotations.c:1546
 msgid "Annotations attached to the object"
 msgstr "Bijgevoegde aantekeningen"
+
+#: src/emblem-picker/gnui-emblem-picker.c:1403
+#, fuzzy
+#| msgid "Could not erase file's annotations"
+msgid "Could not read file's emblems"
+msgstr "De aantekeningen kunnen niet worden gewist"
+
+#: src/emblem-picker/gnui-emblem-picker.c:2519
+#: src/emblem-picker/gnui-emblem-picker.c:2537
+msgid "Unsupported emblems"
+msgstr ""
+
+#. TRANSLATORS: Please keep this text below 30 characters
+#: src/emblem-picker/gnui-emblem-picker.c:2521
+#: src/emblem-picker/gnui-emblem-picker.c:2539
+msgid "We coudn't render those :-("
+msgstr ""
+
+#: src/emblem-picker/gnui-emblem-picker.c:2659
+#, c-format
+msgid ""
+"gnui_emblem_picker_save() - No files were passed to GnuiEmblemPicker widget "
+"with address %p."
+msgstr ""
