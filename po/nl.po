@@ -184,13 +184,13 @@ msgstr "De aantekeningen kunnen niet worden uitgelezen"
 #: src/emblem-picker/gnui-emblem-picker.c:2519
 #: src/emblem-picker/gnui-emblem-picker.c:2537
 msgid "Unsupported emblems"
-msgstr "Niet-ondersteunde emblemen"
+msgstr "Onbekende emblemen"
 
 #. TRANSLATORS: Please keep this text below 30 characters
 #: src/emblem-picker/gnui-emblem-picker.c:2521
 #: src/emblem-picker/gnui-emblem-picker.c:2539
 msgid "We coudn't render those :-("
-msgstr "Deze kunnen niet worden geladen. :-("
+msgstr "Deze zijn niet geladen. :-("
 
 #: src/emblem-picker/gnui-emblem-picker.c:2659
 #, c-format
