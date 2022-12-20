@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: nautilus-annotations 1.0.0\n"
 "Report-Msgid-Bugs-To: madmurphy333@gmail.com\n"
 "POT-Creation-Date: 2022-12-18 02:41+0000\n"
-"PO-Revision-Date: 2021-09-20 14:27+0200\n"
+"PO-Revision-Date: 2022-12-20 11:01+0100\n"
 "Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
 "Language-Team: \n"
 "Language: nl\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.0\n"
+"X-Generator: Poedit 3.2.2\n"
 
 #: src/nautilus-annotations.c:280
 msgid "Could not erase file's annotations"
@@ -35,15 +35,15 @@ msgstr "De aantekeningen kunnen niet worden opgeslagen"
 
 #: src/nautilus-annotations.c:426
 msgid "Could not save file's emblems"
-msgstr ""
+msgstr "De emblemen kunnen niet worden opgeslagen"
 
 #: src/nautilus-annotations.c:428
 msgid "Unknown error"
-msgstr ""
+msgstr "Onbekende foutmelding"
 
 #: src/nautilus-annotations.c:444
 msgid "Could not refresh Nautilus emblems"
-msgstr ""
+msgstr "De emblemen kunnen niet worden herladen"
 
 #: src/nautilus-annotations.c:549
 msgid "Are you sure you want to discard the current changes?"
@@ -178,21 +178,19 @@ msgid "Annotations attached to the object"
 msgstr "Bijgevoegde aantekeningen"
 
 #: src/emblem-picker/gnui-emblem-picker.c:1403
-#, fuzzy
-#| msgid "Could not erase file's annotations"
 msgid "Could not read file's emblems"
-msgstr "De aantekeningen kunnen niet worden gewist"
+msgstr "De aantekeningen kunnen niet worden uitgelezen"
 
 #: src/emblem-picker/gnui-emblem-picker.c:2519
 #: src/emblem-picker/gnui-emblem-picker.c:2537
 msgid "Unsupported emblems"
-msgstr ""
+msgstr "Niet-ondersteunde emblemen"
 
 #. TRANSLATORS: Please keep this text below 30 characters
 #: src/emblem-picker/gnui-emblem-picker.c:2521
 #: src/emblem-picker/gnui-emblem-picker.c:2539
 msgid "We coudn't render those :-("
-msgstr ""
+msgstr "Deze kunnen niet worden geladen. :-("
 
 #: src/emblem-picker/gnui-emblem-picker.c:2659
 #, c-format
@@ -200,3 +198,5 @@ msgid ""
 "gnui_emblem_picker_save() - No files were passed to GnuiEmblemPicker widget "
 "with address %p."
 msgstr ""
+"gnui_emblem_picker_save() - Er zijn geen bestanden overgedragen aan de "
+"GnuiEmblemPicker-widget met adres %p."
