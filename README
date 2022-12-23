@@ -33,13 +33,18 @@ synchronized with the new path.
 Annotations are “per user”. This means that although Alice has the right to
 annotate Bob's files, only Alice will have access to her own annotations.
 
-Emblems are displayed by the extension and will not be shown once the extension
-is uninstalled (the `metadata::emblems` database entry for the file is left
-untouched). The content of the annotations instead is managed by **GIO** and
+Annotation emblems are displayed by the extension and will not be shown once
+the extension is uninstalled (the `metadata::emblems` database entry for the
+file is left untouched). The content of the annotations instead is managed by
+**GIO** and will survive uninstalling the extension.
+
+With version 2.0.0 an emblem picker has been added to the annotations window.
+Differently than the text annotation emblem, this _will_ change the
+`metadata::emblems` database entry for the file and the emblems set in this way
 will survive uninstalling the extension.
 
-Annotations are stored in `~/.local/share/gvfs-metadata`. It is possible to
-access them via command line by launching:
+Emblems and annotations are stored in `~/.local/share/gvfs-metadata`. It is
+possible to access annotations via command line by launching:
 
 ``` sh
 gio info -a metadata::annotation /path/to/file
@@ -55,6 +60,19 @@ To unset an annotation via command line launch:
 
 ``` sh
 gio set -t unset /path/to/file metadata::annotation
+```
+
+To set the group of emblems via command line launch:
+
+``` sh
+gio set -t stringv /path/to/file metadata::emblems emblem-one emblem-two \
+	emblem-three ... emblem-nth
+```
+
+To unset all emblems via command line launch:
+
+``` sh
+gio set -t unset /path/to/file metadata::emblems
 ```
 
 

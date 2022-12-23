@@ -75,7 +75,7 @@
     The emblem view's minimum width
 
 **/
-#define GNUI_EMBLEM_PICKER_PAGE_MIN_WIDTH 256
+#define GNUI_EMBLEM_PICKER_PAGE_MIN_WIDTH 250
 
 
 /**
@@ -85,7 +85,7 @@
     The emblem view's minimum height
 
 **/
-#define GNUI_EMBLEM_PICKER_PAGE_MIN_HEIGHT 256
+#define GNUI_EMBLEM_PICKER_PAGE_MIN_HEIGHT 250
 
 
 /**
@@ -211,7 +211,7 @@ static const GtkStateFlags GNUI_EMBLEM_PICKER_STATE_TRANSLATIONS[] =
 
     GnuiEmblemPickerPageNum:
 
-    The two page identifiers of the emblem picker's leaflet
+    The page identifiers of the emblem picker's leaflet
 
 **/
 typedef enum _GnuiEmblemPickerPageNum {
@@ -564,6 +564,7 @@ static gboolean gnui_emblem_picker_filter_emblem_cell (
 	#undef page
 
 }
+
 
 
 /*  Implementation  */
@@ -2536,6 +2537,7 @@ static void gnui_emblem_picker_init (
 	gtk_box_append(
 		GTK_BOX(page_2_of_2),
 		gnui_emblem_picker_build_action_button(
+			/*  TRANSLATORS: Please keep this text below 21 characters  */
 			_("Unsupported emblems"),
 			/*  TRANSLATORS: Please keep this text below 30 characters  */
 			_("We coudn't render those :-("),

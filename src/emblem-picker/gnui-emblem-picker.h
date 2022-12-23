@@ -193,8 +193,8 @@ typedef enum GnuiEmblemPickerSaveResult {
     @saved_state:           (auto): The last saved state of the emblem
     @current_state:         (auto): The current state of the emblem
     @inconsistent_group:    (auto) (transfer none) (nullable): The inconsistent
-                            group of files that can have the emblem assigned
-                            independently of the other files
+                            group of `GFile` handles that can have the emblem
+                            assigned independently of the other files
     @user_data:             (auto) (nullable) (closure): The custom data
                             provided by the user
 
@@ -216,7 +216,8 @@ typedef gboolean (* GnuiEmblemPickerForeachFunc) (
 /**
 
     GnuiEmblemPickerForeachSavedFileFunc:
-    @self:              (auto) (not nullable): The emblem picker
+    @location:          (auto) (not nullable): The file for which the function
+                        is being called
     @added_emblems:     (auto) (transfer none) (nullable): The emblems added to
                         the file, or `NULL`
     @removed_emblems:   (auto) (transfer none) (nullable): The emblems removed
@@ -233,7 +234,7 @@ typedef gboolean (* GnuiEmblemPickerForeachFunc) (
 
 **/
 typedef gboolean (* GnuiEmblemPickerForeachSavedFileFunc) (
-    GFile * self,
+    GFile * location,
     const gchar * const * added_emblems,
     const gchar * const * removed_emblems,
     GnuiEmblemPickerSaveResult result,
@@ -368,7 +369,7 @@ extern gboolean gnui_emblem_picker_set_emblem_state (
 
     Get the `const` list of the files mapped by an emblem picker
 
-    Returns:    (transfer none): A `GList` containing `GFile` pointers (do not
+    Returns:    (transfer none): A `GList` containing `GFile` handles (do not
                 free or modify it)
 
 **/
@@ -399,7 +400,7 @@ extern GList * gnui_emblem_picker_get_mapped_files (
     gnui_emblem_picker_set_mapped_files: (set-property mapped-files)
     @self:              (not nullable): The emblem picker
     @file_selection:    (transfer none) (nullable): A `GList` containing
-                        pointers to `GFile` handles to map for their emblems
+                        `GFile` handles to map for their emblems
 
     Set the list of the files mapped by an emblem picker
 
@@ -633,9 +634,9 @@ extern void gnui_emblem_picker_set_all_selections (
     @saved_state:                   (auto) The last saved state of the emblem
     @current_state:                 (auto) The current state of the emblem
     @inconsistent_group:            (auto) (transfer none) (nullable): The
-                                    inconsistent group of files that can have
-                                    the emblem assigned independently from the
-                                    other files or `NULL`
+                                    inconsistent group of `GFile` handles that
+                                    can have the emblem assigned independently
+                                    from the other files, or `NULL`
     @user_data:                     (auto) (nullable) (closure): The custom
                                     data passed to the signal
 

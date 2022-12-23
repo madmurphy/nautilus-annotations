@@ -1,14 +1,14 @@
 # Dutch translations for Nautilus Annotations.
-# Copyright (C) 2021 madmurphy333@gmail.com
+# Copyright (C) 2021-2022 madmurphy333@gmail.com
 # This file is distributed under the same license as the Nautilus Annotations
 # package.
-# Heimen Stoffels <vistausss AT fastmail DOT com>, 2021.
+# Heimen Stoffels <vistausss AT fastmail DOT com>, 2021-2022.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: nautilus-annotations 1.0.0\n"
+"Project-Id-Version: nautilus-annotations 2.0.1\n"
 "Report-Msgid-Bugs-To: madmurphy333@gmail.com\n"
-"POT-Creation-Date: 2022-12-18 02:41+0000\n"
+"POT-Creation-Date: 2022-12-20 11:01+0100\n"
 "PO-Revision-Date: 2022-12-20 11:01+0100\n"
 "Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
 "Language-Team: \n"
@@ -25,9 +25,9 @@ msgstr "De aantekeningen kunnen niet worden gewist"
 
 #: src/nautilus-annotations.c:281 src/nautilus-annotations.c:385
 #: src/nautilus-annotations.c:427 src/nautilus-annotations.c:445
-#: src/nautilus-annotations.c:1089 src/emblem-picker/gnui-emblem-picker.c:1404
+#: src/nautilus-annotations.c:1089 src/emblem-picker/gnui-emblem-picker.c:1405
 msgid "unknown location"
-msgstr "Onbekende locatie"
+msgstr "onbekende locatie"
 
 #: src/nautilus-annotations.c:384
 msgid "Could not save file's annotations"
@@ -177,22 +177,23 @@ msgstr[1] "Voeg een aantekening toe aan de items"
 msgid "Annotations attached to the object"
 msgstr "Bijgevoegde aantekeningen"
 
-#: src/emblem-picker/gnui-emblem-picker.c:1403
+#: src/emblem-picker/gnui-emblem-picker.c:1404
 msgid "Could not read file's emblems"
 msgstr "De aantekeningen kunnen niet worden uitgelezen"
 
-#: src/emblem-picker/gnui-emblem-picker.c:2519
-#: src/emblem-picker/gnui-emblem-picker.c:2537
+#. TRANSLATORS: Please keep this text below 21 characters
+#: src/emblem-picker/gnui-emblem-picker.c:2522
+#: src/emblem-picker/gnui-emblem-picker.c:2541
 msgid "Unsupported emblems"
 msgstr "Onbekende emblemen"
 
 #. TRANSLATORS: Please keep this text below 30 characters
-#: src/emblem-picker/gnui-emblem-picker.c:2521
-#: src/emblem-picker/gnui-emblem-picker.c:2539
+#: src/emblem-picker/gnui-emblem-picker.c:2524
+#: src/emblem-picker/gnui-emblem-picker.c:2543
 msgid "We coudn't render those :-("
-msgstr "Deze zijn niet geladen. :-("
+msgstr "Deze zijn niet geladen :-("
 
-#: src/emblem-picker/gnui-emblem-picker.c:2659
+#: src/emblem-picker/gnui-emblem-picker.c:2663
 #, c-format
 msgid ""
 "gnui_emblem_picker_save() - No files were passed to GnuiEmblemPicker widget "

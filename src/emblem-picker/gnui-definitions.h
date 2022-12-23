@@ -459,7 +459,7 @@ static inline GList * gnui_list_prepend_llink (
                 to the member to remove and which after the call will be set to
                 the next member in the list
 
-    Like `gnui_list_detach_and_move_to_next()`, but the `::prev` `::next`
+    Like `gnui_list_detach_and_move_to_next()`, but the `.prev` and `.next`
     members of the removed element are not set to `NULL` (please use it only if
     you know what you are doing)
 

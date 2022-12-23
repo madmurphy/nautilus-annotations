@@ -1,9 +1,10 @@
 emblempicker flowbox {
-	padding: 6px;
+	padding: 7px;
 }
 
 emblempicker emblem.supported {
 	border-radius: 9px;
+	margin: 1px;
 }
 
 emblempicker emblem.unsupported:first-child {

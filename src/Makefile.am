@@ -29,7 +29,9 @@ CLEANFILES = \
 
 EXTRA_DIST = \
 	emblem-picker \
-	resources
+	icons \
+	nautilus-annotations.gresources.xml \
+	style.css
 
 
 nautilus_extensiondir = $(NAUTILUS_EXTENSION_DIR)
@@ -65,15 +67,13 @@ libnautilus_annotations_la_CPPFLAGS = \
 	'-DGNUISANCE_CONST_BUILD_FLAG_NO_ENVIRONMENT'
 
 
-nautilus-annotations.gresources.c: \
- resources/nautilus-annotations.gresources.xml
-	glib-compile-resources --sourcedir='resources' --target='$@' \
+nautilus-annotations.gresources.c: nautilus-annotations.gresources.xml
+	glib-compile-resources --target='$@' \
 	--c-name gnui_emblem_picker --generate-source '$<';
 
 
-nautilus-annotations.gresources.h: \
- resources/nautilus-annotations.gresources.xml
-	glib-compile-resources --sourcedir='resources' --target='$@' \
+nautilus-annotations.gresources.h: nautilus-annotations.gresources.xml
+	glib-compile-resources --target='$@' \
 	--c-name gnui_emblem_picker --generate-header '$<';
 
 
